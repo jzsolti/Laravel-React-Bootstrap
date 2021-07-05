@@ -6,17 +6,44 @@ import UserAccount from './pages/UserAccount';
 import Login from './auth/Login';
 import Logout from './auth/Logout';
 import Register from './auth/Register';
+import api from '../config/api';
 
 class App extends React.Component {
 
     constructor(props) {
         super(props);
-       
+
+        this.state = {
+            userLoggedIn: false
+        }
+
+        this.userLoggedInHandler = this.userLoggedInHandler.bind(this)
+    }
+
+    componentDidMount() {
+        this.checkLoggedIn();
+    }
+
+    checkLoggedIn() {
+        api.post('loggedin').then((response) => {
+
+
+            this.setState({
+                userLoggedIn: ('logged_in' in response.data)
+            });
+
+
+            console.log(this.state.userLoggedIn);
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
+
+    userLoggedInHandler() {
+        this.checkLoggedIn();
     }
 
     render() {
-        
-       let userLoggedin = localStorage.getItem('user_loggedin') !== null;
 
         return <div>
             <BrowserRouter>
@@ -40,10 +67,11 @@ class App extends React.Component {
                             <Navbar.Collapse id="basic-navbar-nav" >
                                 <Nav className="mr-auto" >
                                     <NavLink to="/" className="nav-link" exact>Home</NavLink>
-                                    {userLoggedin && <NavLink to="/user-account" className="nav-link" >UserAccount</NavLink>}
-                                    {!userLoggedin && <NavLink to="/login" className="nav-link" >Login</NavLink>}
-                                    {!userLoggedin && <NavLink to="/register" className="nav-link" >Registration</NavLink>}
-                                    <Logout />
+                                    {this.state.userLoggedIn && <NavLink to="/user-account" className="nav-link" >Account</NavLink>}
+                                    {!this.state.userLoggedIn && <NavLink to="/login" className="nav-link" >Login</NavLink>}
+                                    {!this.state.userLoggedIn && <NavLink to="/register" className="nav-link" >Registration</NavLink>}
+                                    
+                                    {this.state.userLoggedIn && <Logout userLoggedInHandler={this.userLoggedInHandler}/>}
                                 </Nav>
                             </Navbar.Collapse>
                         </Navbar>
@@ -52,16 +80,15 @@ class App extends React.Component {
 
                     <div className="content pb-5">
                         <Switch>
-                        <Route path="/user-account" >
-                                {userLoggedin ? <UserAccount /> :  <Redirect to="/login" />}
+                            <Route path="/user-account" >
+                                {this.state.userLoggedIn ? <UserAccount /> : <Redirect to="/login" />}
                             </Route>
                             <Route path="/login" >
-                                {userLoggedin ? <Redirect to="/" /> : <Login />}
+                                {this.state.userLoggedIn ? <Redirect to="/" /> : <Login userLoggedInHandler={this.userLoggedInHandler} />}
                             </Route>
                             <Route path="/register" >
-                                {userLoggedin ? <Redirect to="/" /> : <Register />}
+                                {this.state.userLoggedIn ? <Redirect to="/" /> : <Register />}
                             </Route>
-
                             <Route path="/" >
                                 <Home />
                             </Route>

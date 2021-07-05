@@ -12,7 +12,8 @@ class Logout extends React.Component {
         event.preventDefault();
 
         api.post('logout').then((response) => {
-            localStorage.clear();
+            
+            this.props.userLoggedInHandler();
             this.props.history.push('/');
 
         }).catch((error) => {
@@ -21,9 +22,7 @@ class Logout extends React.Component {
     }
 
     render(){
-        let userLoggedin = localStorage.getItem('user_loggedin') !== null;
-
-        return userLoggedin && <a className="nav-link" onClick={this.logoutHandler} href="#" aria-current="page">Logout</a>
+        return <a className="nav-link" onClick={this.logoutHandler} href="#" aria-current="page">Logout</a>
     }
 }
 export default withRouter(Logout);

@@ -40,9 +40,7 @@ class Loginform extends React.Component {
                     if ('user' in response.data) {
                        
                        localStorage.setItem('user_loggedin', 1);
-                        //localStorage.setItem('user_email_verified', response.user.email_verified);
-                        //localStorage.setItem('user_name', response.user.name);
-                        //localStorage.setItem('user_email', response.user.email);
+                       
                         this.props.history.push('/');
                        
                     }

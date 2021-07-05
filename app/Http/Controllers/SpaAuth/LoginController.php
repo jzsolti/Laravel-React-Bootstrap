@@ -18,10 +18,6 @@ class LoginController extends Controller
     {
        // dd(Auth::check());
 
-       return response()->json(['user' => [
-        'email' =>  'aaa@aa.gg'
-     ]]);
-
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -41,11 +37,7 @@ class LoginController extends Controller
 
             $request->session()->regenerate();
 
-            $user = Auth::user();
-
-            return response()->json(['user' => [
-               'email' =>  $user->email
-            ]]);
+            return response()->json(['logged_in' => 1]);
 
         }else{
             return response()->json(['errors' => ['email' => ['The provided credentials do not match our records.']]], 422);
@@ -68,5 +60,12 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json(['success' => true]);
+    }
+
+    
+    public function loggedIn()
+    {
+        $response = Auth::check()? ['logged_in' => 1]:['not_logged_in' => 1];
+        return response()->json($response);
     }
 }
