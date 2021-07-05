@@ -16,33 +16,20 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-       // dd(Auth::check());
-
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
             'remember' => 'nullable|boolean'
         ]);
 
-        /*if(Auth::check()){
-            Auth::logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-        dd(Auth::check());
-        }*/
-
         if (Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $request->has('remember'))) {
 
             $request->session()->regenerate();
-
             return response()->json(['logged_in' => 1]);
 
         }else{
             return response()->json(['errors' => ['email' => ['The provided credentials do not match our records.']]], 422);
         }
-
     }
 
     /**

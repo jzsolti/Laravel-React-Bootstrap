@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\SpaAuth;
 
 use Illuminate\Http\Request;
-
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use App\Models\User, App\Models\UserVerification;
+use App\Notifications\EmailVerification;
 
 class RegisterController extends Controller
 {
@@ -31,11 +32,15 @@ class RegisterController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
 
-        $this->create($validated);
+        $user = $this->create($validated);
 
-        //$this->guard()->login($user);
+        UserVerification::create(['user_id' => $user->id, 'token' => Crypt::encryptString($user->email)]);
 
-        return response()->json(['success' => true]);
+        $user->notify(new EmailVerification());
+
+        $this->guard()->login($user);
+
+        return response()->json(['logged_in' => 1]);
     }
 
     /**
@@ -65,10 +70,10 @@ class RegisterController extends Controller
      *
      * @return \Illuminate\Contracts\Auth\StatefulGuard
      */
-    /*protected function guard()
+    protected function guard()
     {
         return Auth::guard();
-    }*/
+    }
 
 
     /**

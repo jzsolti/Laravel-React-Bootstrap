@@ -34,13 +34,12 @@ class Login extends React.Component {
                     password: this.state.password,
                     remember: this.state.remember,
                 }).then((response) => {
-                    // aaa@aa.gg 
 
                     if ('logged_in' in response.data) {
 
                         this.props.userLoggedInHandler();
 
-                        this.props.history.push('/');
+                        this.props.history.push('/user-account');
                     }
 
                 }).catch((error) => {
@@ -49,7 +48,7 @@ class Login extends React.Component {
                             formErrors: FormHelper.updateFormErrors(this.state.formErrors, error.response.data.errors)
                         });
                     } else {
-                        //console.error(error);
+                        console.error(error);
                     }
                 });
             });
