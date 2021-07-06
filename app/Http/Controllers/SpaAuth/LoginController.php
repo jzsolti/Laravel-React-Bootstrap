@@ -22,11 +22,10 @@ class LoginController extends Controller
             'remember' => 'nullable|boolean'
         ]);
 
-        if (Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $request->has('remember'))) {
+        if ( Auth::guard()->attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $credentials['remember']) ) {
 
             $request->session()->regenerate();
             return response()->json(['logged_in' => 1]);
-
         }else{
             return response()->json(['errors' => ['email' => ['The provided credentials do not match our records.']]], 422);
         }
@@ -40,6 +39,7 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
+        
         Auth::logout();
 
         $request->session()->invalidate();
@@ -52,7 +52,18 @@ class LoginController extends Controller
     
     public function loggedIn()
     {
-        $response = Auth::check()? ['logged_in' => 1]:['not_logged_in' => 1];
+        $response = [];
+        
+        if(Auth::check()){
+            $response['logged_in'] = 1;
+
+            if(Auth::user()->email_verified_at){
+                $response['email_verified'] = 1;
+            }
+        }else{
+            $response['not_logged_id'] = 1;
+        }
+
         return response()->json($response);
     }
 }

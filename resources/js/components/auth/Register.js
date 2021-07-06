@@ -38,7 +38,7 @@ class Register extends React.Component {
             .then((response) => {
 
                 if ('logged_in' in response.data) {
-                    this.props.userLoggedInHandler();
+                    this.props.userStatusHandler();
                 }
 
             }).then(() => {

@@ -6,17 +6,8 @@ import UserAccount from './pages/UserAccount';
 import Login from './auth/Login';
 import Logout from './auth/Logout';
 import Register from './auth/Register';
+import VerifyEmail from './auth/VerifyEmail'
 import api from '../config/api';
-
-function VerifyEmail(){
-    let { token } = useParams();
-                             
-    return (
-      <div>
-        <h3>token: {token}</h3>
-      </div>
-    );
-}
 
 class App extends React.Component {
 
@@ -24,29 +15,34 @@ class App extends React.Component {
         super(props);
 
         this.state = {
-            userLoggedIn: false
+            userLoggedIn: false,
+            userVerified: false
         }
 
-        this.userLoggedInHandler = this.userLoggedInHandler.bind(this)
+        this.userStatusHandler = this.userStatusHandler.bind(this)
     }
 
     componentDidMount() {
-        this.checkLoggedIn();
+        this.checkUserStatus();
     }
 
-    checkLoggedIn() {
-        api.post('loggedin').then((response) => {
-            this.setState({userLoggedIn: ('logged_in' in response.data)});
+    checkUserStatus() {
+        api.post('user/status').then((response) => {
+            if('email_verified' in response.data){
+                this.setState({userLoggedIn: true, userVerified: true});
+            }else if('logged_in' in response.data){
+                this.setState({userLoggedIn: true,  userVerified: false});
+            }else if('not_logged_id' in response.data){
+                this.setState({userLoggedIn: false,  userVerified: false}); 
+            }
         }).catch((error) => {
             console.error(error);
         });
     }
 
-    userLoggedInHandler() {
-        this.checkLoggedIn();
+    userStatusHandler() {
+        this.checkUserStatus();
     }
-
-    
 
     render() {
 
@@ -76,7 +72,7 @@ class App extends React.Component {
                                     {!this.state.userLoggedIn && <NavLink to="/login" className="nav-link" >Login</NavLink>}
                                     {!this.state.userLoggedIn && <NavLink to="/register" className="nav-link" >Registration</NavLink>}
                                     
-                                    {this.state.userLoggedIn && <Logout userLoggedInHandler={this.userLoggedInHandler}/>}
+                                    {this.state.userLoggedIn && <Logout userStatusHandler={this.userStatusHandler}/>}
                                 </Nav>
                             </Navbar.Collapse>
                         </Navbar>
@@ -89,14 +85,13 @@ class App extends React.Component {
                                 {this.state.userLoggedIn ? <UserAccount /> : <Redirect to="/login" />}
                             </Route>
                             <Route path="/login" >
-                                {this.state.userLoggedIn ? <Redirect to="/" /> : <Login userLoggedInHandler={this.userLoggedInHandler} />}
+                                {this.state.userLoggedIn ? <Redirect to="/" /> : <Login userStatusHandler={this.userStatusHandler} />}
                             </Route>
                             <Route path="/register" >
-                                {this.state.userLoggedIn ? <Redirect to="/" /> : <Register userLoggedInHandler={this.userLoggedInHandler}/>}
+                                {this.state.userLoggedIn ? <Redirect to="/" /> : <Register userStatusHandler={this.userStatusHandler}/>}
                             </Route>
                             <Route path="/verify-email/:token" >
-                               
-                                   {<VerifyEmail />}
+                                   {this.state.userVerified === false ? <VerifyEmail userStatusHandler={this.userStatusHandler}/> : <Redirect to="/" />}
                             </Route>
                             
                             <Route path="/" >

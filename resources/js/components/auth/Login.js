@@ -37,7 +37,7 @@ class Login extends React.Component {
 
                     if ('logged_in' in response.data) {
 
-                        this.props.userLoggedInHandler();
+                        this.props.userStatusHandler();
 
                         this.props.history.push('/user-account');
                     }

@@ -24,7 +24,9 @@ Route::post('password/reset', 'App\Http\Controllers\Auth\ResetPasswordController
 Route::post('register', 'App\Http\Controllers\SpaAuth\RegisterController@register');
 Route::post('login', 'App\Http\Controllers\SpaAuth\LoginController@login');
 Route::post('logout', 'App\Http\Controllers\SpaAuth\LoginController@logout');
-Route::post('loggedin', 'App\Http\Controllers\SpaAuth\LoginController@loggedIn');
+Route::post('user/status', 'App\Http\Controllers\SpaAuth\LoginController@loggedIn');
+Route::post('verify/email', 'App\Http\Controllers\SpaAuth\VerificationController@verify');
+Route::post('verify/resend', 'App\Http\Controllers\SpaAuth\VerificationController@resend');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -13,7 +13,7 @@ class Logout extends React.Component {
 
         api.post('logout').then((response) => {
             
-            this.props.userLoggedInHandler();
+            this.props.userStatusHandler();
             this.props.history.push('/');
 
         }).catch((error) => {
