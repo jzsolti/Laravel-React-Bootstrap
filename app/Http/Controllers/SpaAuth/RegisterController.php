@@ -32,13 +32,17 @@ class RegisterController extends Controller
 
         $user = $this->create($validated);
 
-        UserVerification::create(['user_id' => $user->id, 'token' => Crypt::encryptString($user->email)]);
+        //Generate a random string.
+        $token = openssl_random_pseudo_bytes(16);
+
+       
+        $token =  $user->id.bin2hex(random_bytes(45));
+
+        UserVerification::create(['user_id' => $user->id, 'token' =>  $token]);
 
         $user->notify(new EmailVerification());
 
-        $this->guard()->login($user);
-
-        return response()->json(['logged_in' => 1]);
+        return response()->json(['success' => 1]);
     }
 
     /**

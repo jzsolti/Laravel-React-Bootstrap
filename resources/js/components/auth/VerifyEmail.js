@@ -11,32 +11,21 @@ class VerifyEmail extends React.Component {
             verification: null
         }
 
-       
     }
 
-
     componentDidMount() {
-        // post to server
+
         api.post('verify/email', { token: this.props.match.params.token })
             .then((response) => {
-                if ('logged_in' in response.data) {
-                    if ('verified' in response.data) {
-                        // user was logged in and verification was successfull
-                        this.props.userStatusHandler();
 
-                        this.setState({
-                            verification: 'success'
-                        });
-                    } else {
-                        this.setState({
-                            verification: 'failed'
-                        });
-                    }
-
-                } else {
-                    // rediredtto login
+                if ('success' in response.data) {
                     this.props.history.push('/login');
+                } else {
+                    this.setState({
+                        verification: 'failed'
+                    });
                 }
+
             }).catch((error) => {
                 console.error(error);
             });
@@ -44,9 +33,17 @@ class VerifyEmail extends React.Component {
 
     render() {
         return <div>
-            {this.state.verification === 'success' && <div>success</div>}
+            <div className="row justify-content-center">
+                <div className="col-md-8">
 
-            {this.state.verification === 'failed' && <div>failed</div>}
+                    {this.state.verification === 'failed' && <div className="card">
+                        <div className="card-header">Something went wrong!</div>
+                        <div className="card-body">
+                        </div>
+                    </div>}
+
+                </div>
+            </div>
         </div>;
     }
 }

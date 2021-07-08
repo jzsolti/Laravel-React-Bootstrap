@@ -6,7 +6,7 @@ import UserAccount from './pages/UserAccount';
 import Login from './auth/Login';
 import Logout from './auth/Logout';
 import Register from './auth/Register';
-import VerifyEmail from './auth/VerifyEmail'
+import VerifyEmail from './auth/VerifyEmail';
 import api from '../config/api';
 
 class App extends React.Component {
@@ -88,12 +88,12 @@ class App extends React.Component {
                                 {this.state.userLoggedIn ? <Redirect to="/" /> : <Login userStatusHandler={this.userStatusHandler} />}
                             </Route>
                             <Route path="/register" >
-                                {this.state.userLoggedIn ? <Redirect to="/" /> : <Register userStatusHandler={this.userStatusHandler}/>}
+                                {this.state.userLoggedIn ? <Redirect to="/" /> : <Register />}
                             </Route>
                             <Route path="/verify-email/:token" >
-                                   {this.state.userVerified === false ? <VerifyEmail userStatusHandler={this.userStatusHandler}/> : <Redirect to="/" />}
+                                   <VerifyEmail userStatusHandler={this.userStatusHandler}/>
                             </Route>
-                            
+                           
                             <Route path="/" >
                                 <Home />
                             </Route>

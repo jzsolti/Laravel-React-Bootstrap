@@ -2301,15 +2301,11 @@ var App = /*#__PURE__*/function (_React$Component) {
                   path: "/register",
                   children: this.state.userLoggedIn ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_12__.Redirect, {
                     to: "/"
-                  }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_auth_Register__WEBPACK_IMPORTED_MODULE_5__.default, {
-                    userStatusHandler: this.userStatusHandler
-                  })
+                  }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_auth_Register__WEBPACK_IMPORTED_MODULE_5__.default, {})
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_12__.Route, {
                   path: "/verify-email/:token",
-                  children: this.state.userVerified === false ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_auth_VerifyEmail__WEBPACK_IMPORTED_MODULE_6__.default, {
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_auth_VerifyEmail__WEBPACK_IMPORTED_MODULE_6__.default, {
                     userStatusHandler: this.userStatusHandler
-                  }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_12__.Redirect, {
-                    to: "/"
                   })
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_12__.Route, {
                   path: "/",
@@ -2401,6 +2397,10 @@ var Login = /*#__PURE__*/function (_React$Component) {
             _this.props.userStatusHandler();
 
             _this.props.history.push('/user-account');
+          } else if ('need_vefification' in response.data) {
+            _this.setState({
+              need_vefification: true
+            });
           }
         })["catch"](function (error) {
           if (error.response && error.response.status === 422) {
@@ -2418,6 +2418,7 @@ var Login = /*#__PURE__*/function (_React$Component) {
       email: '',
       password: '',
       remember: true,
+      need_vefification: null,
       formErrors: {
         email: null,
         password: null
@@ -2435,7 +2436,10 @@ var Login = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+      return this.state.need_vefification ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+        className: "need_vefification",
+        children: "need_vefification..."
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
         className: "row justify-content-center pt-5",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
           className: "col-md-8",
@@ -2685,11 +2689,11 @@ var Register = /*#__PURE__*/function (_React$Component) {
       var formData = JSON.parse(JSON.stringify(_this.state));
       delete formData.formErrors;
       _config_api__WEBPACK_IMPORTED_MODULE_1__.default.post('register', formData).then(function (response) {
-        if ('logged_in' in response.data) {
-          _this.props.userStatusHandler();
+        if ('success' in response.data) {
+          _this.setState({
+            registrationSuccess: true
+          });
         }
-      }).then(function () {
-        _this.props.history.push('/user-account');
       })["catch"](function (error) {
         if (error.response && error.response.status === 422) {
           _this.setState({
@@ -2707,6 +2711,7 @@ var Register = /*#__PURE__*/function (_React$Component) {
       password: '',
       password_confirmation: '',
       remember: true,
+      registrationSuccess: false,
       formErrors: {
         name: null,
         email: null,
@@ -2725,7 +2730,10 @@ var Register = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+      return this.state.registrationSuccess ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+        classNname: "",
+        children: "success"
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
         className: "row justify-content-center pt-5",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
           className: "col-md-8",
@@ -2903,26 +2911,15 @@ var VerifyEmail = /*#__PURE__*/function (_React$Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      // post to server
       _config_api__WEBPACK_IMPORTED_MODULE_1__.default.post('verify/email', {
         token: this.props.match.params.token
       }).then(function (response) {
-        if ('logged_in' in response.data) {
-          if ('verified' in response.data) {
-            // user was logged in and verification was successfull
-            _this2.props.userStatusHandler();
-
-            _this2.setState({
-              verification: 'success'
-            });
-          } else {
-            _this2.setState({
-              verification: 'failed'
-            });
-          }
-        } else {
-          // rediredtto login
+        if ('success' in response.data) {
           _this2.props.history.push('/login');
+        } else {
+          _this2.setState({
+            verification: 'failed'
+          });
         }
       })["catch"](function (error) {
         console.error(error);
@@ -2931,12 +2928,22 @@ var VerifyEmail = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-        children: [this.state.verification === 'success' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
-          children: "success"
-        }), this.state.verification === 'failed' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
-          children: "failed"
-        })]
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+          className: "row justify-content-center",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+            className: "col-md-8",
+            children: this.state.verification === 'failed' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+              className: "card",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+                className: "card-header",
+                children: "Something went wrong!"
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+                className: "card-body"
+              })]
+            })
+          })
+        })
       });
     }
   }]);

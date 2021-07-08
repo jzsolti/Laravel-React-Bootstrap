@@ -11,6 +11,7 @@ class Login extends React.Component {
             email: '',
             password: '',
             remember: true,
+            need_vefification: null,
             formErrors: {
                 email: null,
                 password: null,
@@ -40,6 +41,8 @@ class Login extends React.Component {
                         this.props.userStatusHandler();
 
                         this.props.history.push('/user-account');
+                    } else if ('need_vefification' in response.data) {
+                        this.setState({ need_vefification: true });
                     }
 
                 }).catch((error) => {
@@ -57,6 +60,11 @@ class Login extends React.Component {
     render() {
 
         return (
+
+            this.state.need_vefification ? 
+
+<div className="need_vefification">need_vefification...</div>
+            :
             <div className="row justify-content-center pt-5">
                 <div className="col-md-8">
                     <div className="card">

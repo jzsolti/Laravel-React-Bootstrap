@@ -14,6 +14,7 @@ class Register extends React.Component {
             password: '',
             password_confirmation: '',
             remember: true,
+            registrationSuccess: false,
             formErrors: {
                 name: null,
                 email: null,
@@ -37,12 +38,10 @@ class Register extends React.Component {
         api.post('register', formData)
             .then((response) => {
 
-                if ('logged_in' in response.data) {
-                    this.props.userStatusHandler();
+                if ('success' in response.data) {
+                    this.setState({ registrationSuccess: true });
                 }
 
-            }).then(() => {
-                this.props.history.push('/user-account');
             })
             .catch((error) => {
                 if (error.response && error.response.status === 422) {
@@ -57,82 +56,86 @@ class Register extends React.Component {
 
     render() {
         return (
-            <div className="row justify-content-center pt-5">
-                <div className="col-md-8">
-                    <div className="card">
-                        <div className="card-header bg-info">Registration</div>
-                        <div className="card-body">
-                            <form method="POST" onSubmit={this.submitHandler}>
-                                <div className="form-group row">
-                                    <label htmlFor="name" className="col-md-4 col-form-label text-md-right">Name</label>
-                                    <div className="col-md-6">
-                                        <input
-                                            name="name"
-                                            type="text"
-                                            value={this.state.name}
-                                            onChange={this.handleInputChange}
-                                            className={FormHelper.inputClassName(this.state.formErrors.name)} />
-                                        <div className={FormHelper.feedbackClass(this.state.formErrors.name)}>
-                                            {this.state.formErrors.name}
+
+            this.state.registrationSuccess ?
+                <div classNname="">success</div>
+                :
+                <div className="row justify-content-center pt-5">
+                    <div className="col-md-8">
+                        <div className="card">
+                            <div className="card-header bg-info">Registration</div>
+                            <div className="card-body">
+                                <form method="POST" onSubmit={this.submitHandler}>
+                                    <div className="form-group row">
+                                        <label htmlFor="name" className="col-md-4 col-form-label text-md-right">Name</label>
+                                        <div className="col-md-6">
+                                            <input
+                                                name="name"
+                                                type="text"
+                                                value={this.state.name}
+                                                onChange={this.handleInputChange}
+                                                className={FormHelper.inputClassName(this.state.formErrors.name)} />
+                                            <div className={FormHelper.feedbackClass(this.state.formErrors.name)}>
+                                                {this.state.formErrors.name}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="form-group row">
-                                    <label htmlFor="email" className="col-md-4 col-form-label text-md-right">E-Mail</label>
-                                    <div className="col-md-6">
-                                        <input
-                                            name="email"
-                                            type="email"
-                                            value={this.state.email}
-                                            onChange={this.handleInputChange}
-                                            className={FormHelper.inputClassName(this.state.formErrors.email)} />
-                                        <div className={FormHelper.feedbackClass(this.state.formErrors.email)}>
-                                            {this.state.formErrors.email}
+                                    <div className="form-group row">
+                                        <label htmlFor="email" className="col-md-4 col-form-label text-md-right">E-Mail</label>
+                                        <div className="col-md-6">
+                                            <input
+                                                name="email"
+                                                type="email"
+                                                value={this.state.email}
+                                                onChange={this.handleInputChange}
+                                                className={FormHelper.inputClassName(this.state.formErrors.email)} />
+                                            <div className={FormHelper.feedbackClass(this.state.formErrors.email)}>
+                                                {this.state.formErrors.email}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="form-group row">
-                                    <label htmlFor="password" className="col-md-4 col-form-label text-md-right">Password</label>
-                                    <div className="col-md-6">
-                                        <input
-                                            name="password"
-                                            type="password"
-                                            value={this.state.password}
-                                            onChange={this.handleInputChange}
-                                            className={FormHelper.inputClassName(this.state.formErrors.password)} />
-                                        <div className={FormHelper.feedbackClass(this.state.formErrors.password)}>
-                                            {this.state.formErrors.password}
+                                    <div className="form-group row">
+                                        <label htmlFor="password" className="col-md-4 col-form-label text-md-right">Password</label>
+                                        <div className="col-md-6">
+                                            <input
+                                                name="password"
+                                                type="password"
+                                                value={this.state.password}
+                                                onChange={this.handleInputChange}
+                                                className={FormHelper.inputClassName(this.state.formErrors.password)} />
+                                            <div className={FormHelper.feedbackClass(this.state.formErrors.password)}>
+                                                {this.state.formErrors.password}
+                                            </div>
+
                                         </div>
-
                                     </div>
-                                </div>
-                                <div className="form-group row">
-                                    <label htmlFor="password_confirmation" className="col-md-4 col-form-label text-md-right">Password confirmation</label>
-                                    <div className="col-md-6">
-                                        <input
-                                            name="password_confirmation"
-                                            type="password"
-                                            value={this.state.password_confirmation}
-                                            onChange={this.handleInputChange}
-                                            className="form-control" />
+                                    <div className="form-group row">
+                                        <label htmlFor="password_confirmation" className="col-md-4 col-form-label text-md-right">Password confirmation</label>
+                                        <div className="col-md-6">
+                                            <input
+                                                name="password_confirmation"
+                                                type="password"
+                                                value={this.state.password_confirmation}
+                                                onChange={this.handleInputChange}
+                                                className="form-control" />
 
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="form-group row mb-0">
-                                    <div className="col-md-8 offset-md-4">
-                                        <button type="submit" className="btn btn-primary">
-                                            Register
-                                        </button>
+                                    <div className="form-group row mb-0">
+                                        <div className="col-md-8 offset-md-4">
+                                            <button type="submit" className="btn btn-primary">
+                                                Register
+                                            </button>
 
+                                        </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
         )
     }
 }
