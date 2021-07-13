@@ -27,7 +27,6 @@ Route::post('logout', 'App\Http\Controllers\SpaAuth\LoginController@logout');
 Route::post('user/status', 'App\Http\Controllers\SpaAuth\LoginController@loggedIn');
 Route::post('verify/email', 'App\Http\Controllers\SpaAuth\LoginController@verifyEmail');
 
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

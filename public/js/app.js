@@ -2387,6 +2387,11 @@ var Login = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "submitHandler", function (event) {
       event.preventDefault();
+
+      _this.setState({
+        isDisabled: true
+      });
+
       _config_api__WEBPACK_IMPORTED_MODULE_2__.default.get('/sanctum/csrf-cookie').then(function () {
         _config_api__WEBPACK_IMPORTED_MODULE_2__.default.post('login', {
           email: _this.state.email,
@@ -2399,13 +2404,16 @@ var Login = /*#__PURE__*/function (_React$Component) {
             _this.props.history.push('/user-account');
           } else if ('need_vefification' in response.data) {
             _this.setState({
-              need_vefification: true
+              need_vefification: true,
+              isDisabled: false
             });
           }
         })["catch"](function (error) {
           if (error.response && error.response.status === 422) {
             _this.setState({
-              formErrors: _form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.updateFormErrors(_this.state.formErrors, error.response.data.errors)
+              formErrors: _form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.updateFormErrors(_this.state.formErrors, error.response.data.errors),
+              isDisabled: false,
+              password: ''
             });
           } else {
             console.error(error);
@@ -2419,6 +2427,8 @@ var Login = /*#__PURE__*/function (_React$Component) {
       password: '',
       remember: true,
       need_vefification: null,
+      verifyEmailMsg: null,
+      isDisabled: false,
       formErrors: {
         email: null,
         password: null
@@ -2434,16 +2444,31 @@ var Login = /*#__PURE__*/function (_React$Component) {
       this.setState(_form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.handleInputChangeNewValue(event));
     }
   }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var msg = localStorage.getItem('verify-email-msg');
+
+      if (msg) {
+        this.setState({
+          verifyEmailMsg: msg
+        });
+        localStorage.removeItem('verify-email-msg');
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
-      return this.state.need_vefification ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-        className: "need_vefification",
-        children: "need_vefification..."
-      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
         className: "row justify-content-center pt-5",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
           className: "col-md-8",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+          children: [this.state.need_vefification && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+            className: "alert alert-warning need_vefification",
+            children: ["Verify Your Email Address", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("br", {}), "Before login, please check your email for a verification link."]
+          }), this.state.verifyEmailMsg !== null && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+            className: "alert alert-info",
+            children: "After logging in, your email address will be confirmed."
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
             className: "card",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
               className: "card-header bg-info",
@@ -2466,7 +2491,8 @@ var Login = /*#__PURE__*/function (_React$Component) {
                       type: "email",
                       value: this.state.email,
                       onChange: this.handleInputChange,
-                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.inputClassName(this.state.formErrors.email)
+                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.inputClassName(this.state.formErrors.email),
+                      disabled: this.state.isDisabled
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
                       className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.feedbackClass(this.state.formErrors.email),
                       children: this.state.formErrors.email
@@ -2485,7 +2511,8 @@ var Login = /*#__PURE__*/function (_React$Component) {
                       type: "password",
                       value: this.state.password,
                       onChange: this.handleInputChange,
-                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.inputClassName(this.state.formErrors.password)
+                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.inputClassName(this.state.formErrors.password),
+                      disabled: this.state.isDisabled
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
                       className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_1__.default.feedbackClass(this.state.formErrors.password),
                       children: this.state.formErrors.password
@@ -2501,7 +2528,8 @@ var Login = /*#__PURE__*/function (_React$Component) {
                         name: "remember",
                         type: "checkbox",
                         checked: this.state.remember,
-                        onChange: this.handleInputChange
+                        onChange: this.handleInputChange,
+                        disabled: this.state.isDisabled
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("label", {
                         className: "form-check-label pl-2",
                         htmlFor: "remember",
@@ -2513,7 +2541,19 @@ var Login = /*#__PURE__*/function (_React$Component) {
                   className: "form-group row mb-0",
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
                     className: "col-md-8 offset-md-4",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+                    children: this.state.isDisabled ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("button", {
+                      className: "btn btn-primary",
+                      type: "button",
+                      disabled: true,
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+                        className: "spinner-border spinner-border-sm",
+                        role: "status",
+                        "aria-hidden": "true"
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+                        className: "sr-only",
+                        children: "Loading..."
+                      })]
+                    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
                       type: "submit",
                       className: "btn btn-primary",
                       children: "Login"
@@ -2522,7 +2562,7 @@ var Login = /*#__PURE__*/function (_React$Component) {
                 })]
               })
             })]
-          })
+          })]
         })
       });
     }
@@ -2686,6 +2726,11 @@ var Register = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "submitHandler", function (event) {
       event.preventDefault();
+
+      _this.setState({
+        isDisabled: true
+      });
+
       var formData = JSON.parse(JSON.stringify(_this.state));
       delete formData.formErrors;
       _config_api__WEBPACK_IMPORTED_MODULE_1__.default.post('register', formData).then(function (response) {
@@ -2697,7 +2742,8 @@ var Register = /*#__PURE__*/function (_React$Component) {
       })["catch"](function (error) {
         if (error.response && error.response.status === 422) {
           _this.setState({
-            formErrors: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.updateFormErrors(_this.state.formErrors, error.response.data.errors)
+            formErrors: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.updateFormErrors(_this.state.formErrors, error.response.data.errors),
+            isDisabled: false
           });
         } else {
           console.error(error);
@@ -2712,6 +2758,7 @@ var Register = /*#__PURE__*/function (_React$Component) {
       password_confirmation: '',
       remember: true,
       registrationSuccess: false,
+      isDisabled: false,
       formErrors: {
         name: null,
         email: null,
@@ -2731,8 +2778,8 @@ var Register = /*#__PURE__*/function (_React$Component) {
     key: "render",
     value: function render() {
       return this.state.registrationSuccess ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-        classNname: "",
-        children: "success"
+        classNname: "alert alert-success",
+        children: "A fresh verification link has been sent to your email address. Check your email for a verification link."
       }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
         className: "row justify-content-center pt-5",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
@@ -2760,7 +2807,8 @@ var Register = /*#__PURE__*/function (_React$Component) {
                       type: "text",
                       value: this.state.name,
                       onChange: this.handleInputChange,
-                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.inputClassName(this.state.formErrors.name)
+                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.inputClassName(this.state.formErrors.name),
+                      disabled: this.state.isDisabled
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
                       className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.feedbackClass(this.state.formErrors.name),
                       children: this.state.formErrors.name
@@ -2779,7 +2827,8 @@ var Register = /*#__PURE__*/function (_React$Component) {
                       type: "email",
                       value: this.state.email,
                       onChange: this.handleInputChange,
-                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.inputClassName(this.state.formErrors.email)
+                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.inputClassName(this.state.formErrors.email),
+                      disabled: this.state.isDisabled
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
                       className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.feedbackClass(this.state.formErrors.email),
                       children: this.state.formErrors.email
@@ -2798,7 +2847,8 @@ var Register = /*#__PURE__*/function (_React$Component) {
                       type: "password",
                       value: this.state.password,
                       onChange: this.handleInputChange,
-                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.inputClassName(this.state.formErrors.password)
+                      className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.inputClassName(this.state.formErrors.password),
+                      disabled: this.state.isDisabled
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
                       className: _form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.feedbackClass(this.state.formErrors.password),
                       children: this.state.formErrors.password
@@ -2817,14 +2867,27 @@ var Register = /*#__PURE__*/function (_React$Component) {
                       type: "password",
                       value: this.state.password_confirmation,
                       onChange: this.handleInputChange,
-                      className: "form-control"
+                      className: "form-control",
+                      disabled: this.state.isDisabled
                     })
                   })]
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
                   className: "form-group row mb-0",
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
                     className: "col-md-8 offset-md-4",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+                    children: this.state.isDisabled ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("button", {
+                      className: "btn btn-primary",
+                      type: "button",
+                      disabled: true,
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+                        className: "spinner-border spinner-border-sm",
+                        role: "status",
+                        "aria-hidden": "true"
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+                        className: "sr-only",
+                        children: "Loading..."
+                      })]
+                    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
                       type: "submit",
                       className: "btn btn-primary",
                       children: "Register"
@@ -2915,6 +2978,9 @@ var VerifyEmail = /*#__PURE__*/function (_React$Component) {
         token: this.props.match.params.token
       }).then(function (response) {
         if ('success' in response.data) {
+          // store message
+          localStorage.setItem('verify-email-msg', 1);
+
           _this2.props.history.push('/login');
         } else {
           _this2.setState({

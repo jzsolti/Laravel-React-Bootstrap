@@ -15,6 +15,7 @@ class Register extends React.Component {
             password_confirmation: '',
             remember: true,
             registrationSuccess: false,
+            isDisabled: false,
             formErrors: {
                 name: null,
                 email: null,
@@ -31,22 +32,22 @@ class Register extends React.Component {
 
     submitHandler = (event) => {
         event.preventDefault();
+        this.setState({ isDisabled: true });
 
         const formData = JSON.parse(JSON.stringify(this.state));
         delete formData.formErrors;
 
         api.post('register', formData)
             .then((response) => {
-
                 if ('success' in response.data) {
                     this.setState({ registrationSuccess: true });
                 }
-
             })
             .catch((error) => {
                 if (error.response && error.response.status === 422) {
                     this.setState({
-                        formErrors: FormHelper.updateFormErrors(this.state.formErrors, error.response.data.errors)
+                        formErrors: FormHelper.updateFormErrors(this.state.formErrors, error.response.data.errors),
+                        isDisabled: false
                     });
                 } else {
                     console.error(error);
@@ -58,7 +59,7 @@ class Register extends React.Component {
         return (
 
             this.state.registrationSuccess ?
-                <div classNname="">success</div>
+                <div classNname="alert alert-success">A fresh verification link has been sent to your email address. Check your email for a verification link.</div>
                 :
                 <div className="row justify-content-center pt-5">
                     <div className="col-md-8">
@@ -74,7 +75,8 @@ class Register extends React.Component {
                                                 type="text"
                                                 value={this.state.name}
                                                 onChange={this.handleInputChange}
-                                                className={FormHelper.inputClassName(this.state.formErrors.name)} />
+                                                className={FormHelper.inputClassName(this.state.formErrors.name)} 
+                                                disabled={this.state.isDisabled} />
                                             <div className={FormHelper.feedbackClass(this.state.formErrors.name)}>
                                                 {this.state.formErrors.name}
                                             </div>
@@ -88,7 +90,8 @@ class Register extends React.Component {
                                                 type="email"
                                                 value={this.state.email}
                                                 onChange={this.handleInputChange}
-                                                className={FormHelper.inputClassName(this.state.formErrors.email)} />
+                                                className={FormHelper.inputClassName(this.state.formErrors.email)} 
+                                                disabled={this.state.isDisabled} />
                                             <div className={FormHelper.feedbackClass(this.state.formErrors.email)}>
                                                 {this.state.formErrors.email}
                                             </div>
@@ -103,7 +106,8 @@ class Register extends React.Component {
                                                 type="password"
                                                 value={this.state.password}
                                                 onChange={this.handleInputChange}
-                                                className={FormHelper.inputClassName(this.state.formErrors.password)} />
+                                                className={FormHelper.inputClassName(this.state.formErrors.password)} 
+                                                disabled={this.state.isDisabled} />
                                             <div className={FormHelper.feedbackClass(this.state.formErrors.password)}>
                                                 {this.state.formErrors.password}
                                             </div>
@@ -118,16 +122,27 @@ class Register extends React.Component {
                                                 type="password"
                                                 value={this.state.password_confirmation}
                                                 onChange={this.handleInputChange}
-                                                className="form-control" />
+                                                className="form-control" 
+                                                disabled={this.state.isDisabled} />
 
                                         </div>
                                     </div>
 
                                     <div className="form-group row mb-0">
                                         <div className="col-md-8 offset-md-4">
-                                            <button type="submit" className="btn btn-primary">
+                                           
+
+                                            {this.state.isDisabled ?
+                                            <button className="btn btn-primary" type="button" disabled>
+                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                <span className="sr-only">Loading...</span>
+                                            </button>
+                                            :
+                                            <button type="submit" className="btn btn-primary" >
                                                 Register
                                             </button>
+                                        }
+
 
                                         </div>
                                     </div>

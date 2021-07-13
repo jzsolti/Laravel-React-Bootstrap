@@ -12,6 +12,8 @@ class Login extends React.Component {
             password: '',
             remember: true,
             need_vefification: null,
+            verifyEmailMsg: null,
+            isDisabled: false,
             formErrors: {
                 email: null,
                 password: null,
@@ -27,6 +29,7 @@ class Login extends React.Component {
 
     submitHandler = (event) => {
         event.preventDefault();
+        this.setState({ isDisabled: true });
 
         api.get('/sanctum/csrf-cookie')
             .then(() => {
@@ -42,13 +45,15 @@ class Login extends React.Component {
 
                         this.props.history.push('/user-account');
                     } else if ('need_vefification' in response.data) {
-                        this.setState({ need_vefification: true });
+                        this.setState({ need_vefification: true , isDisabled: false});
                     }
 
                 }).catch((error) => {
                     if (error.response && error.response.status === 422) {
                         this.setState({
-                            formErrors: FormHelper.updateFormErrors(this.state.formErrors, error.response.data.errors)
+                            formErrors: FormHelper.updateFormErrors(this.state.formErrors, error.response.data.errors),
+                            isDisabled: false,
+                            password: ''
                         });
                     } else {
                         console.error(error);
@@ -57,16 +62,28 @@ class Login extends React.Component {
             });
     }
 
+    componentDidMount() {
+        let msg = localStorage.getItem('verify-email-msg');
+        if (msg) {
+            this.setState({ verifyEmailMsg: msg });
+            localStorage.removeItem('verify-email-msg');
+        }
+    }
+
     render() {
 
         return (
-
-            this.state.need_vefification ? 
-
-<div className="need_vefification">need_vefification...</div>
-            :
             <div className="row justify-content-center pt-5">
                 <div className="col-md-8">
+                    {this.state.need_vefification &&
+
+                        <div className="alert alert-warning need_vefification">
+                            Verify Your Email Address<br />
+                            Before login, please check your email for a verification link.
+                        </div>}
+
+                    {this.state.verifyEmailMsg !== null && <div className="alert alert-info">After logging in, your email address will be confirmed.</div>}
+
                     <div className="card">
                         <div className="card-header bg-info">Login</div>
 
@@ -80,7 +97,8 @@ class Login extends React.Component {
                                             type="email"
                                             value={this.state.email}
                                             onChange={this.handleInputChange}
-                                            className={FormHelper.inputClassName(this.state.formErrors.email)} />
+                                            className={FormHelper.inputClassName(this.state.formErrors.email)} 
+                                            disabled={this.state.isDisabled} />
 
                                         <div className={FormHelper.feedbackClass(this.state.formErrors.email)}>
                                             {this.state.formErrors.email}
@@ -96,7 +114,8 @@ class Login extends React.Component {
                                             type="password"
                                             value={this.state.password}
                                             onChange={this.handleInputChange}
-                                            className={FormHelper.inputClassName(this.state.formErrors.password)} />
+                                            className={FormHelper.inputClassName(this.state.formErrors.password)} 
+                                            disabled={this.state.isDisabled} />
                                         <div className={FormHelper.feedbackClass(this.state.formErrors.password)}>
                                             {this.state.formErrors.password}
                                         </div>
@@ -110,8 +129,8 @@ class Login extends React.Component {
                                                 name="remember"
                                                 type="checkbox"
                                                 checked={this.state.remember}
-                                                onChange={this.handleInputChange} />
-
+                                                onChange={this.handleInputChange} 
+                                                disabled={this.state.isDisabled} />
                                             <label className="form-check-label pl-2" htmlFor="remember">
                                                 Remember Me
                                             </label>
@@ -121,9 +140,17 @@ class Login extends React.Component {
 
                                 <div className="form-group row mb-0">
                                     <div className="col-md-8 offset-md-4">
-                                        <button type="submit" className="btn btn-primary">
-                                            Login
-                                        </button>
+                                        {this.state.isDisabled ?
+                                            <button className="btn btn-primary" type="button" disabled>
+                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                <span className="sr-only">Loading...</span>
+                                            </button>
+                                            :
+                                            <button type="submit" className="btn btn-primary" >
+                                                Login
+                                            </button>
+                                        }
+
 
                                     </div>
                                 </div>

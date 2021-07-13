@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SpaAuth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Crypt;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User, App\Models\UserVerification;
@@ -31,14 +31,8 @@ class RegisterController extends Controller
         ]);
 
         $user = $this->create($validated);
-
-        //Generate a random string.
-        $token = openssl_random_pseudo_bytes(16);
-
-       
-        $token =  $user->id.bin2hex(random_bytes(45));
-
-        UserVerification::create(['user_id' => $user->id, 'token' =>  $token]);
+        
+        UserVerification::create(['user_id' => $user->id, 'token' => UserService::generateToken($user)]);
 
         $user->notify(new EmailVerification());
 

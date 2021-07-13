@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Notifications\EmailVerification;
 use App\Models\UserVerification;
 use Carbon\Carbon;
+use App\Services\UserService;
 
 class LoginController extends Controller
 {
@@ -33,7 +34,7 @@ class LoginController extends Controller
                 $this->userEmailVerification($request->session()->get('email_verification_token'));
             } elseif (is_null($user->email_verified_at)) {
                 // resend and message
-                UserVerification::create(['user_id' => $user->id, 'token' => $user->id . bin2hex(random_bytes(45))]);
+                UserVerification::create(['user_id' => $user->id, 'token' => UserService::generateToken($user) ]);
                 $user->notify(new EmailVerification());
                 // logout
                 Auth::logout();

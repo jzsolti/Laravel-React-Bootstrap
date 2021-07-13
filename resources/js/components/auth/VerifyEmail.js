@@ -19,6 +19,9 @@ class VerifyEmail extends React.Component {
             .then((response) => {
 
                 if ('success' in response.data) {
+                    // store message
+                    localStorage.setItem('verify-email-msg', 1);
+
                     this.props.history.push('/login');
                 } else {
                     this.setState({
