@@ -2,6 +2,7 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import api from '../../config/api';
 import FormHelper from '../../form/FormHelper';
+import SendingBtn from '../../form/SendingBtn';
 
 class Register extends React.Component {
 
@@ -55,11 +56,34 @@ class Register extends React.Component {
             });
     }
 
+    input(name, type) {
+
+        return <input
+            name={name}
+            type={type}
+            value={this.state[name]}
+            onChange={this.handleInputChange}
+            className={FormHelper.inputClassName(this.state.formErrors[name])}
+            disabled={this.state.isDisabled} />
+    }
+
+    inputError(name) {
+        return <div className={FormHelper.feedbackClass(this.state.formErrors[name])}>
+            {this.state.formErrors[name]}
+        </div>
+    }
+
+    label(name, text) {
+        return <label htmlFor={name} className="col-md-4 col-form-label text-md-right">{text}</label>
+    }
+
     render() {
         return (
 
             this.state.registrationSuccess ?
-                <div classNname="alert alert-success">A fresh verification link has been sent to your email address. Check your email for a verification link.</div>
+                <div className="alert alert-success">
+                    A fresh verification link has been sent to your email address. Check your email for a verification link.
+                    </div>
                 :
                 <div className="row justify-content-center pt-5">
                     <div className="col-md-8">
@@ -68,82 +92,43 @@ class Register extends React.Component {
                             <div className="card-body">
                                 <form method="POST" onSubmit={this.submitHandler}>
                                     <div className="form-group row">
-                                        <label htmlFor="name" className="col-md-4 col-form-label text-md-right">Name</label>
+                                        {this.label('name', 'Name')}
                                         <div className="col-md-6">
-                                            <input
-                                                name="name"
-                                                type="text"
-                                                value={this.state.name}
-                                                onChange={this.handleInputChange}
-                                                className={FormHelper.inputClassName(this.state.formErrors.name)} 
-                                                disabled={this.state.isDisabled} />
-                                            <div className={FormHelper.feedbackClass(this.state.formErrors.name)}>
-                                                {this.state.formErrors.name}
-                                            </div>
+                                            {this.input('name', 'text')}
+                                            {this.inputError('name')}
                                         </div>
                                     </div>
                                     <div className="form-group row">
-                                        <label htmlFor="email" className="col-md-4 col-form-label text-md-right">E-Mail</label>
+                                        {this.label('email', 'E-Mail')}
                                         <div className="col-md-6">
-                                            <input
-                                                name="email"
-                                                type="email"
-                                                value={this.state.email}
-                                                onChange={this.handleInputChange}
-                                                className={FormHelper.inputClassName(this.state.formErrors.email)} 
-                                                disabled={this.state.isDisabled} />
-                                            <div className={FormHelper.feedbackClass(this.state.formErrors.email)}>
-                                                {this.state.formErrors.email}
-                                            </div>
+                                            {this.input('email', 'email')}
+                                            {this.inputError('email')}
                                         </div>
                                     </div>
 
                                     <div className="form-group row">
-                                        <label htmlFor="password" className="col-md-4 col-form-label text-md-right">Password</label>
+                                        {this.label('password', 'Password')}
                                         <div className="col-md-6">
-                                            <input
-                                                name="password"
-                                                type="password"
-                                                value={this.state.password}
-                                                onChange={this.handleInputChange}
-                                                className={FormHelper.inputClassName(this.state.formErrors.password)} 
-                                                disabled={this.state.isDisabled} />
-                                            <div className={FormHelper.feedbackClass(this.state.formErrors.password)}>
-                                                {this.state.formErrors.password}
-                                            </div>
-
+                                            {this.input('password', 'password')}
+                                            {this.inputError('password')}
                                         </div>
                                     </div>
                                     <div className="form-group row">
-                                        <label htmlFor="password_confirmation" className="col-md-4 col-form-label text-md-right">Password confirmation</label>
+                                        {this.label('password_confirmation', 'Password confirmation')}
                                         <div className="col-md-6">
-                                            <input
-                                                name="password_confirmation"
-                                                type="password"
-                                                value={this.state.password_confirmation}
-                                                onChange={this.handleInputChange}
-                                                className="form-control" 
-                                                disabled={this.state.isDisabled} />
-
+                                            {this.input('password_confirmation', 'password')}
                                         </div>
                                     </div>
 
                                     <div className="form-group row mb-0">
                                         <div className="col-md-8 offset-md-4">
-                                           
-
                                             {this.state.isDisabled ?
-                                            <button className="btn btn-primary" type="button" disabled>
-                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                <span className="sr-only">Loading...</span>
-                                            </button>
-                                            :
-                                            <button type="submit" className="btn btn-primary" >
-                                                Register
-                                            </button>
-                                        }
-
-
+                                                <SendingBtn />
+                                                :
+                                                <button type="submit" className="btn btn-primary" >
+                                                    Register
+                                                </button>
+                                            }
                                         </div>
                                     </div>
                                 </form>

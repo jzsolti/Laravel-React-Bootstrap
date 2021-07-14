@@ -41,4 +41,5 @@ use Illuminate\Support\Facades\Route;
 +--------+----------+------------------------+------------------+------------------------------------------------------------------------+------------+
 */
 
+Route::get('password/reset/{token}', '\App\Http\Controllers\HomeController@index')->name('password.reset'); // this route need because of generating laravel password reset email link
 Route::view('/{path?}', 'index')->where('path', '.*')->name('react');

@@ -1,13 +1,17 @@
 export default  class FormHelper {
 
-    static inputClassName(inputState){
+    static inputClassName(inputErrorState){
         let className = 'form-control';
 
-        if (inputState === null) {
+        if(typeof inputErrorState === 'undefined'){
+            return className;
+        }
+
+        if (inputErrorState === null) {
             className += '';
-        } else if (inputState === '') {
+        } else if (inputErrorState === '') {
             className += ' is-valid';
-        } else if (inputState !== '') {
+        } else if (inputErrorState !== '') {
             className += ' is-invalid';
         }
         return className;
@@ -44,7 +48,5 @@ export default  class FormHelper {
         return {[name]: value};
 
     }
-
-   
 
 }

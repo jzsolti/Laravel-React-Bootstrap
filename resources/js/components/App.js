@@ -3,6 +3,9 @@ import { BrowserRouter, Switch, Route, NavLink, Redirect, useParams } from "reac
 import { Navbar, Nav } from 'react-bootstrap';
 import Home from './pages/Home';
 import UserAccount from './pages/UserAccount';
+import Page404 from './pages/Page404';
+import ForgotPassword from './auth/ForgotPassword';
+import ResetPassword from './auth/ResetPassword';
 import Login from './auth/Login';
 import Logout from './auth/Logout';
 import Register from './auth/Register';
@@ -28,12 +31,12 @@ class App extends React.Component {
 
     checkUserStatus() {
         api.post('user/status').then((response) => {
-            if('email_verified' in response.data){
-                this.setState({userLoggedIn: true, userVerified: true});
-            }else if('logged_in' in response.data){
-                this.setState({userLoggedIn: true,  userVerified: false});
-            }else if('not_logged_id' in response.data){
-                this.setState({userLoggedIn: false,  userVerified: false}); 
+            if ('email_verified' in response.data) {
+                this.setState({ userLoggedIn: true, userVerified: true });
+            } else if ('logged_in' in response.data) {
+                this.setState({ userLoggedIn: true, userVerified: false });
+            } else if ('not_logged_id' in response.data) {
+                this.setState({ userLoggedIn: false, userVerified: false });
             }
         }).catch((error) => {
             console.error(error);
@@ -71,8 +74,8 @@ class App extends React.Component {
                                     {this.state.userLoggedIn && <NavLink to="/user-account" className="nav-link" >Account</NavLink>}
                                     {!this.state.userLoggedIn && <NavLink to="/login" className="nav-link" >Login</NavLink>}
                                     {!this.state.userLoggedIn && <NavLink to="/register" className="nav-link" >Registration</NavLink>}
-                                    
-                                    {this.state.userLoggedIn && <Logout userStatusHandler={this.userStatusHandler}/>}
+
+                                    {this.state.userLoggedIn && <Logout userStatusHandler={this.userStatusHandler} />}
                                 </Nav>
                             </Navbar.Collapse>
                         </Navbar>
@@ -81,6 +84,9 @@ class App extends React.Component {
 
                     <div className="content pb-5">
                         <Switch>
+                            <Route exact path="/" >
+                                <Home />
+                            </Route>
                             <Route path="/user-account" >
                                 {this.state.userLoggedIn ? <UserAccount /> : <Redirect to="/login" />}
                             </Route>
@@ -91,12 +97,18 @@ class App extends React.Component {
                                 {this.state.userLoggedIn ? <Redirect to="/" /> : <Register />}
                             </Route>
                             <Route path="/verify-email/:token" >
-                                   <VerifyEmail userStatusHandler={this.userStatusHandler}/>
+                                <VerifyEmail userStatusHandler={this.userStatusHandler} />
                             </Route>
-                           
-                            <Route path="/" >
-                                <Home />
+                            <Route path="/password/forgot-password" >
+                                {!this.state.userLoggedIn ? <ForgotPassword  /> : <Redirect to="/" />}
                             </Route>
+                            <Route path="/password/reset/:token" >
+                                {!this.state.userLoggedIn ? <ResetPassword  /> : <Redirect to="/" />}
+                            </Route>
+                            <Route path="*">
+                                <Page404 />
+                            </Route>
+
                         </Switch>
                     </div>
 

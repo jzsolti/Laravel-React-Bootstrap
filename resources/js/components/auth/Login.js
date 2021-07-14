@@ -1,6 +1,7 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import FormHelper from '../../form/FormHelper';
+import SendingBtn from '../../form/SendingBtn';
 import api from '../../config/api';
 
 class Login extends React.Component {
@@ -45,7 +46,7 @@ class Login extends React.Component {
 
                         this.props.history.push('/user-account');
                     } else if ('need_vefification' in response.data) {
-                        this.setState({ need_vefification: true , isDisabled: false});
+                        this.setState({ need_vefification: true, isDisabled: false });
                     }
 
                 }).catch((error) => {
@@ -70,6 +71,26 @@ class Login extends React.Component {
         }
     }
 
+    input(name, type) {
+        return <input
+            name={name}
+            type={type}
+            value={this.state[name]}
+            onChange={this.handleInputChange}
+            className={FormHelper.inputClassName(this.state.formErrors[name])}
+            disabled={this.state.isDisabled} />
+    }
+
+    inputError(name) {
+        return <div className={FormHelper.feedbackClass(this.state.formErrors[name])}>
+            {this.state.formErrors[name]}
+        </div>
+    }
+
+    label(name, text) {
+        return <label htmlFor={name} className="col-md-4 col-form-label text-md-right">{text}</label>
+    }
+
     render() {
 
         return (
@@ -78,7 +99,7 @@ class Login extends React.Component {
                     {this.state.need_vefification &&
 
                         <div className="alert alert-warning need_vefification">
-                            Verify Your Email Address<br />
+                            Verify Your Email Address <br />
                             Before login, please check your email for a verification link.
                         </div>}
 
@@ -89,38 +110,22 @@ class Login extends React.Component {
 
                         <div className="card-body">
                             <form method="POST" onSubmit={this.submitHandler}>
-                                <div className="form-group row">
-                                    <label htmlFor="email" className="col-md-4 col-form-label text-md-right">E-Mail</label>
-                                    <div className="col-md-6">
-                                        <input
-                                            name="email"
-                                            type="email"
-                                            value={this.state.email}
-                                            onChange={this.handleInputChange}
-                                            className={FormHelper.inputClassName(this.state.formErrors.email)} 
-                                            disabled={this.state.isDisabled} />
 
-                                        <div className={FormHelper.feedbackClass(this.state.formErrors.email)}>
-                                            {this.state.formErrors.email}
-                                        </div>
+                                <div className="form-group row">
+                                    {this.label('email', 'E-Mail')}
+                                    <div className="col-md-6">
+                                        {this.input('email', 'email')}
+                                        {this.inputError('email')}
                                     </div>
                                 </div>
 
                                 <div className="form-group row">
-                                    <label htmlFor="password" className="col-md-4 col-form-label text-md-right">Password</label>
+                                    {this.label('password', 'Password')}
                                     <div className="col-md-6">
-                                        <input
-                                            name="password"
-                                            type="password"
-                                            value={this.state.password}
-                                            onChange={this.handleInputChange}
-                                            className={FormHelper.inputClassName(this.state.formErrors.password)} 
-                                            disabled={this.state.isDisabled} />
-                                        <div className={FormHelper.feedbackClass(this.state.formErrors.password)}>
-                                            {this.state.formErrors.password}
-                                        </div>
-
+                                        {this.input('password', 'password')}
+                                        {this.inputError('password')}
                                     </div>
+
                                 </div>
                                 <div className="form-group row">
                                     <div className="col-md-6 offset-md-4">
@@ -129,7 +134,7 @@ class Login extends React.Component {
                                                 name="remember"
                                                 type="checkbox"
                                                 checked={this.state.remember}
-                                                onChange={this.handleInputChange} 
+                                                onChange={this.handleInputChange}
                                                 disabled={this.state.isDisabled} />
                                             <label className="form-check-label pl-2" htmlFor="remember">
                                                 Remember Me
@@ -141,25 +146,26 @@ class Login extends React.Component {
                                 <div className="form-group row mb-0">
                                     <div className="col-md-8 offset-md-4">
                                         {this.state.isDisabled ?
-                                            <button className="btn btn-primary" type="button" disabled>
-                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                <span className="sr-only">Loading...</span>
-                                            </button>
+                                            <SendingBtn />
                                             :
                                             <button type="submit" className="btn btn-primary" >
                                                 Login
                                             </button>
                                         }
+                                    </div>
+                                </div>
 
-
+                                <div className="form-group row mt-3">
+                                    <div className="col-md-8 offset-md-4">
+                                        <Link to="/password/forgot-password">Forgot Your Password?</Link>
                                     </div>
                                 </div>
                             </form>
+
                         </div>
                     </div>
                 </div>
             </div>
-
         )
     }
 }
