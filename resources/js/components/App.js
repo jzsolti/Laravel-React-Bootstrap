@@ -4,6 +4,8 @@ import { Navbar, Nav } from 'react-bootstrap';
 import Home from './pages/Home';
 import UserAccount from './pages/UserAccount';
 import Articles from './pages/Articles';
+import MyArticles from './pages/MyArticles';
+import MyArticle from './pages/MyArticle';
 import Page404 from './pages/Page404';
 import ForgotPassword from './auth/ForgotPassword';
 import ResetPassword from './auth/ResetPassword';
@@ -74,6 +76,7 @@ class App extends React.Component {
                                     <NavLink to="/" className="nav-link" exact>Home</NavLink>
                                     <NavLink to="/articles" className="nav-link" exact>Articles</NavLink>
                                     {this.state.userLoggedIn && <NavLink to="/user-account" className="nav-link" >Account</NavLink>}
+                                    {this.state.userLoggedIn && <NavLink to="/user/articles" className="nav-link" >My articles</NavLink>}
                                     {!this.state.userLoggedIn && <NavLink to="/login" className="nav-link" >Login</NavLink>}
                                     {!this.state.userLoggedIn && <NavLink to="/register" className="nav-link" >Registration</NavLink>}
 
@@ -89,11 +92,20 @@ class App extends React.Component {
                             <Route exact path="/" >
                                 <Home />
                             </Route>
+                            
+                            <Route path="/articles" >
+                                <Articles />
+                            </Route>
+
                             <Route path="/user-account" >
                                 {this.state.userLoggedIn ? <UserAccount /> : <Page404 />}
                             </Route>
-                            <Route path="/articles" >
-                                <Articles />
+                            <Route path="/user/articles" >
+                                {this.state.userLoggedIn ? <MyArticles/> : <Page404 />}
+                            </Route>
+
+                            <Route path="/user/article/:id?" >
+                                {this.state.userLoggedIn ? <MyArticle/> : <Page404 />}
                             </Route>
 
                             <Route path="/login" >

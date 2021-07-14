@@ -2,8 +2,8 @@ import React from 'react';
 import api from '../../config/api';
 import FormHelper from '../../form/FormHelper';
 import SendingBtn from '../../form/SendingBtn';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 
 class UserAccount extends React.Component {
 

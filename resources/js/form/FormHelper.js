@@ -49,4 +49,20 @@ export default  class FormHelper {
 
     }
 
+    static getFormData( inputs, state){
+        let formData = {};
+        inputs.forEach((item) => {
+            formData[item] = state[item];
+        });
+        return formData;
+    }
+
+    static resetValidation( inputs){
+        let formErrors = {};
+        inputs.forEach((item) => {
+            formErrors[item] = null;
+        });
+        return formErrors;
+    }
+
 }
