@@ -3,6 +3,7 @@ import { BrowserRouter, Switch, Route, NavLink, Redirect, useParams } from "reac
 import { Navbar, Nav } from 'react-bootstrap';
 import Home from './pages/Home';
 import UserAccount from './pages/UserAccount';
+import Articles from './pages/Articles';
 import Page404 from './pages/Page404';
 import ForgotPassword from './auth/ForgotPassword';
 import ResetPassword from './auth/ResetPassword';
@@ -71,6 +72,7 @@ class App extends React.Component {
                             <Navbar.Collapse id="basic-navbar-nav" >
                                 <Nav className="mr-auto" >
                                     <NavLink to="/" className="nav-link" exact>Home</NavLink>
+                                    <NavLink to="/articles" className="nav-link" exact>Articles</NavLink>
                                     {this.state.userLoggedIn && <NavLink to="/user-account" className="nav-link" >Account</NavLink>}
                                     {!this.state.userLoggedIn && <NavLink to="/login" className="nav-link" >Login</NavLink>}
                                     {!this.state.userLoggedIn && <NavLink to="/register" className="nav-link" >Registration</NavLink>}
@@ -90,6 +92,9 @@ class App extends React.Component {
                             <Route path="/user-account" >
                                 {this.state.userLoggedIn ? <UserAccount /> : <Page404 />}
                             </Route>
+                            <Route path="/articles" >
+                                <Articles />
+                            </Route>
 
                             <Route path="/login" >
                                 {this.state.userLoggedIn ? <Redirect to="/" /> : <Login userStatusHandler={this.userStatusHandler} />}
@@ -101,10 +106,10 @@ class App extends React.Component {
                                 <VerifyEmail userStatusHandler={this.userStatusHandler} />
                             </Route>
                             <Route path="/password/forgot-password" >
-                                {!this.state.userLoggedIn ? <ForgotPassword  /> : <Redirect to="/" />}
+                                {!this.state.userLoggedIn ? <ForgotPassword /> : <Redirect to="/" />}
                             </Route>
                             <Route path="/password/reset/:token" >
-                                {!this.state.userLoggedIn ? <ResetPassword  /> : <Redirect to="/" />}
+                                {!this.state.userLoggedIn ? <ResetPassword /> : <Redirect to="/" />}
                             </Route>
                             <Route path="*">
                                 <Page404 />
