@@ -14,7 +14,6 @@ class Register extends React.Component {
             email: '',
             password: '',
             password_confirmation: '',
-            remember: true,
             registrationSuccess: false,
             isDisabled: false,
             formErrors: {
@@ -37,6 +36,8 @@ class Register extends React.Component {
 
         const formData = JSON.parse(JSON.stringify(this.state));
         delete formData.formErrors;
+        delete formData.registrationSuccess;
+        delete formData.isDisabled;
 
         api.post('register', formData)
             .then((response) => {

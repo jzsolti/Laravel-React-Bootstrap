@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-/*Route::post('login', 'App\Http\Controllers\Auth\LoginController@login');
+/* Route::post('login', 'App\Http\Controllers\Auth\LoginController@login');
 Route::post('logout', 'App\Http\Controllers\Auth\LoginController@logout');
 Route::post('register', 'App\Http\Controllers\Auth\RegisterController@register');
 Route::post('password/confirm', ' App\Http\Controllers\Auth\ConfirmPasswordController@confirm');
 Route::post('password/email', 'App\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail');
-Route::post('password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset');*/
+Route::post('password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset'); */
 
 Route::post('register', 'App\Http\Controllers\SpaAuth\RegisterController@register');
 Route::post('login', 'App\Http\Controllers\SpaAuth\LoginController@login');
@@ -31,6 +31,11 @@ Route::post('password/confirm', ' App\Http\Controllers\SpaAuth\ForgotPasswordCon
 Route::post('password/reset-password', 'App\Http\Controllers\SpaAuth\ForgotPasswordController@resetPassword');
 
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});*/
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('user-account/get-user', 'App\Http\Controllers\UserController@getUser');
+    Route::post('user-account/update', 'App\Http\Controllers\UserController@update');
 });

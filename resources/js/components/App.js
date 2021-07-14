@@ -88,8 +88,9 @@ class App extends React.Component {
                                 <Home />
                             </Route>
                             <Route path="/user-account" >
-                                {this.state.userLoggedIn ? <UserAccount /> : <Redirect to="/login" />}
+                                {this.state.userLoggedIn ? <UserAccount /> : <Page404 />}
                             </Route>
+
                             <Route path="/login" >
                                 {this.state.userLoggedIn ? <Redirect to="/" /> : <Login userStatusHandler={this.userStatusHandler} />}
                             </Route>
