@@ -1,5 +1,6 @@
 import React from 'react';
 import { withRouter, Link } from "react-router-dom";
+import api from '../../config/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
@@ -14,6 +15,16 @@ class MyArticles extends React.Component {
         }
     }
 
+    componentDidMount() {
+
+        api.get(`user/articles`)
+            .then((response) => {
+                this.setState({ loaded: true, articles: response.data });
+            }).catch((error) => {
+                console.log(error);
+            });
+    }
+
     render() {
 
         return (
@@ -24,7 +35,7 @@ class MyArticles extends React.Component {
                             <div>My articles</div>
                             <div> <Link to="/user/article" className="btn btn-primary"><FontAwesomeIcon icon={faPlus} /></Link> </div>
                         </div>
-                        <div className="card-body">
+                        
                             {
                                 this.state.loaded ?
                                     <table className="table table-dark">
@@ -57,7 +68,7 @@ class MyArticles extends React.Component {
                                         <span className="sr-only">Loading </span>
                                     </div>
                             }
-                        </div>
+                        <div className="card-body"></div>
                     </div>
                 </div>
             </div>

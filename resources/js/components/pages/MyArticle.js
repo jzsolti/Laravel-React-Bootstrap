@@ -17,7 +17,7 @@ class MyArticle extends React.Component {
             isDisabled: false,
             formErrors: {
                 title: null,
-                lead : null,
+                lead: null,
                 content: null,
             }
         };
@@ -43,7 +43,11 @@ class MyArticle extends React.Component {
                     this.setState(updateState);
 
                 }).catch((error) => {
-                    console.error(error);
+                    if (error.response && error.response.status === 404) {
+                        this.props.history.push('/_404');
+                    } else {
+                        console.error(error);
+                    }
                 });
         }
 
@@ -78,14 +82,14 @@ class MyArticle extends React.Component {
                 if ('id' in response.data) {
                     this.setState({ isDisabled: false, created: true });
 
-                    setTimeout(() => {this.setState({ created: false }); }, 5000);
+                    setTimeout(() => { this.setState({ created: false }); }, 5000);
 
                     this.props.history.push(`/user/article/${response.data.id}`);
                 }
 
-                if('updated' in response.data){
-                    this.setState({ isDisabled: false, updated: true, formErrors: FormHelper.resetValidation(this.inputs)  });
-                    setTimeout(() => {this.setState({ updated: false });}, 5000);
+                if ('updated' in response.data) {
+                    this.setState({ isDisabled: false, updated: true, formErrors: FormHelper.resetValidation(this.inputs) });
+                    setTimeout(() => { this.setState({ updated: false }); }, 5000);
                 }
             })
             .catch((error) => {
@@ -129,7 +133,7 @@ class MyArticle extends React.Component {
 
                     {this.state.created && <div className="alert alert-success">New article created </div>}
                     {this.state.updated && <div className="alert alert-success">Article updated </div>}
-                    
+
                     <div className="card">
                         <div className="card-header bg-warning d-flex justify-content-between">
                             <div>{this.getId() === null ? 'New article' : 'Edit article'} </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\ArticleRequest;
 use App\Models\Article;
+use DB;
 
 class UserArticleController extends Controller
 {
@@ -18,10 +19,18 @@ class UserArticleController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(Request $request){
-       $articles =  Article::where('user_id', $request->user()->id)->get()->only('title', 'lead', 'content');
-       
-       return response($articles);
+    public function index(Request $request)
+    {
+        $articles = Article::where('user_id', $request->user()->id)->orderBy('created_at','desc')->get();
+
+        $response = [];
+
+        foreach ($articles as $i => $article) {
+            $article->created = $article->created_at->format('Y-m-d');
+            $response[$i] = $article;
+        }
+
+        return response($response);
     }
 
     public function article(Request $request, Article $article)
@@ -29,7 +38,7 @@ class UserArticleController extends Controller
         if ($request->user()->id !== $article->user_id) {
             abort(404);
         }
-        return response($article->only('title', 'lead', 'content'));
+        return response($article->only(['title', 'lead', 'content']));
     }
 
     /**
