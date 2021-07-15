@@ -17,6 +17,7 @@ class ArticleResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'edit' => '/user/article/'.$this->id,
             'title' => $this->title,
             'lead' => Str::limit($this->lead, 20),
             'content' => $this->content,

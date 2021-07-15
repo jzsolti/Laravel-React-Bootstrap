@@ -12285,6 +12285,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _config_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config/api */ "./resources/js/config/api.js");
 /* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @fortawesome/react-fontawesome */ "./node_modules/@fortawesome/react-fontawesome/index.es.js");
 /* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.es.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -12319,6 +12321,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 
 
+
 var DataTable = /*#__PURE__*/function (_React$Component) {
   _inherits(DataTable, _React$Component);
 
@@ -12329,7 +12332,12 @@ var DataTable = /*#__PURE__*/function (_React$Component) {
 
     _classCallCheck(this, DataTable);
 
-    _this = _super.call(this, props); //console.log(this.props);
+    _this = _super.call(this, props);
+    _this.columnNames = [];
+
+    _this.props.columns.map(function (column) {
+      _this.columnNames.push(column.name);
+    });
 
     _this.state = {
       entities: {
@@ -12345,7 +12353,7 @@ var DataTable = /*#__PURE__*/function (_React$Component) {
       },
       first_page: 1,
       current_page: 1,
-      sorted_column: _this.props.columns[_this.props.sorted_column ? _this.props.sorted_column : 0],
+      sorted_column: _this.props.sorted_column,
       offset: 4,
       order: 'asc'
     };
@@ -12376,11 +12384,6 @@ var DataTable = /*#__PURE__*/function (_React$Component) {
       }, function () {
         _this3.fetchEntities();
       });
-    }
-  }, {
-    key: "columnHead",
-    value: function columnHead(value) {
-      return value.split('_').join(' ').toUpperCase();
     }
   }, {
     key: "pagesNumbers",
@@ -12437,18 +12440,27 @@ var DataTable = /*#__PURE__*/function (_React$Component) {
         });
       }
 
-      return this.props.columns.map(function (column) {
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("th", {
-          className: "table-head",
-          onClick: function onClick() {
-            return _this5.sortByColumn(column);
-          },
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-            children: _this5.columnHead(column)
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-            children: column === _this5.state.sorted_column && icon
-          })]
-        }, column);
+      return this.props.columns.map(function (column, key) {
+        if (typeof column.orderable === 'undefined' || column.orderable === true) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("th", {
+            className: "table-head",
+            onClick: function onClick() {
+              return _this5.sortByColumn(column.name);
+            },
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+              children: column.label
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+              children: column.name === _this5.state.sorted_column && icon
+            })]
+          }, key);
+        } else {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
+            className: "table-head",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+              children: column.label
+            })
+          }, key);
+        }
       });
     }
   }, {
@@ -12459,10 +12471,22 @@ var DataTable = /*#__PURE__*/function (_React$Component) {
       if (this.state.entities.data.length) {
         return this.state.entities.data.map(function (entity) {
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tr", {
-            children: Object.keys(entity).map(function (key) {
-              if (_this6.props.columns.includes(key)) {
+            children: _this6.props.columns.map(function (column, key) {
+              if (typeof column.link !== 'undefined') {
                 return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
-                  children: entity[key]
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Link, {
+                    className: "btn btn-info btn-sm",
+                    to: entity[column.name],
+                    children: column.label
+                  })
+                }, key);
+              } else if (typeof entity[column.name] !== 'undefined') {
+                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
+                  children: entity[column.name]
+                }, key);
+              } else {
+                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
+                  children: "-"
                 }, key);
               }
             })
@@ -12578,7 +12602,7 @@ var DataTable = /*#__PURE__*/function (_React$Component) {
   return DataTable;
 }(react__WEBPACK_IMPORTED_MODULE_0__.Component);
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DataTable);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,react_router_dom__WEBPACK_IMPORTED_MODULE_6__.withRouter)(DataTable));
 
 /***/ }),
 
@@ -14126,7 +14150,21 @@ var MyArticles = /*#__PURE__*/function (_React$Component) {
     _classCallCheck(this, MyArticles);
 
     _this = _super.call(this);
-    _this.columns = ['title', 'lead', 'created_at'];
+    _this.columns = [{
+      name: "edit",
+      label: "Edit",
+      orderable: false,
+      link: true
+    }, {
+      name: "title",
+      label: "Title"
+    }, {
+      name: "lead",
+      label: "Lead"
+    }, {
+      name: "created_at",
+      label: "Created"
+    }];
     return _this;
   }
 
@@ -14152,12 +14190,13 @@ var MyArticles = /*#__PURE__*/function (_React$Component) {
                   })
                 }), " "]
               })]
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_DataTable__WEBPACK_IMPORTED_MODULE_2__.default, {
-              url: "/user/articles",
-              columns: this.columns,
-              sorted_column: 2
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-              className: "card-body"
+              className: "card-body",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_DataTable__WEBPACK_IMPORTED_MODULE_2__.default, {
+                url: "/user/articles",
+                columns: this.columns,
+                sorted_column: "created_at"
+              })
             })]
           })
         })

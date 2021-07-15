@@ -6,13 +6,17 @@ import React from 'react';
 import api from '../config/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { withRouter, Link } from 'react-router-dom';
 
 class DataTable extends React.Component {
     constructor(props) {
         super(props);
 
-       
-//console.log(this.props);
+        this.columnNames = [];
+        this.props.columns.map((column) => {
+            this.columnNames.push(column.name);
+        });
+
 
         this.state = {
             entities: {
@@ -28,7 +32,7 @@ class DataTable extends React.Component {
             },
             first_page: 1,
             current_page: 1,
-            sorted_column: this.props.columns[  (this.props.sorted_column)? this.props.sorted_column: 0 ],
+            sorted_column: this.props.sorted_column,
             offset: 4,
             order: 'asc',
         };
@@ -47,10 +51,6 @@ class DataTable extends React.Component {
 
     changePage(pageNumber) {
         this.setState({ current_page: pageNumber }, () => { this.fetchEntities() });
-    }
-
-    columnHead(value) {
-        return value.split('_').join(' ').toUpperCase()
     }
 
     pagesNumbers() {
@@ -81,14 +81,22 @@ class DataTable extends React.Component {
         if (this.state.order === 'asc') {
             icon = <FontAwesomeIcon icon={faArrowUp} />;
         } else {
-            icon =  <FontAwesomeIcon icon={faArrowDown} />;
+            icon = <FontAwesomeIcon icon={faArrowDown} />;
         }
-        return this.props.columns.map(column => {
-            return <th className="table-head" key={column} onClick={() => this.sortByColumn(column)}>
+        return this.props.columns.map((column, key) => {
 
-                <span>{this.columnHead(column)}</span>
-                <span>{column === this.state.sorted_column && icon}</span>
-            </th>
+
+            if (typeof column.orderable === 'undefined' || column.orderable === true) {
+                return <th className="table-head" key={key} onClick={() => this.sortByColumn(column.name)}>
+                    <span>{column.label}</span>
+                    <span>{column.name === this.state.sorted_column && icon}</span>
+                </th>
+            } else {
+                return <th className="table-head" key={key}>
+                    <span>{column.label}</span>
+                </th>
+            }
+
         });
     }
 
@@ -97,11 +105,21 @@ class DataTable extends React.Component {
             return this.state.entities.data.map(entity => {
 
                 return <tr key={entity.id}>
-                    {Object.keys(entity).map(key => {
-                        if (this.props.columns.includes(key) ) {
-                            return <td key={key}>{entity[key]}</td>
-                        }
-                    })}
+                    {
+                        this.props.columns.map((column, key) => {
+
+                            if (typeof column.link !== 'undefined') {
+                                return <td key={key}>
+                                    
+                                    <Link className="btn btn-info btn-sm" to={entity[column.name]}>{column.label}</Link>
+                                    </td>
+                            } else if (typeof entity[column.name] !== 'undefined') {
+                                return <td key={key}>{entity[column.name]}</td>
+                            } else {
+                                return <td key={key}>-</td>
+                            }
+                        })
+                    }
                 </tr>
             })
         } else {
@@ -165,4 +183,4 @@ class DataTable extends React.Component {
     }
 }
 
-export default DataTable;
+export default withRouter(DataTable);

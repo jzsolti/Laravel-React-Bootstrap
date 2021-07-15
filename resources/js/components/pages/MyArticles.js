@@ -8,14 +8,13 @@ class MyArticles extends React.Component {
 
     constructor() {
         super();
+
         this.columns = [
-            'title'  ,
-            'lead',
-            'created_at'
+            { name: "edit", label: "Edit", orderable: false, link: true },
+            { name: "title", label: "Title" },
+            { name: "lead", label: "Lead" },
+            { name: "created_at", label: "Created" },
         ];
-
-
-
     }
 
     render() {
@@ -29,14 +28,8 @@ class MyArticles extends React.Component {
                             <div> <Link to="/user/article" className="btn btn-primary"><FontAwesomeIcon icon={faPlus} /></Link> </div>
                         </div>
 
-                        <DataTable
-                            url="/user/articles"
-                            columns={this.columns}
-                            sorted_column={2}
-                        />
-
                         <div className="card-body">
-
+                            <DataTable url="/user/articles" columns={this.columns} sorted_column="created_at" />
                         </div>
                     </div>
                 </div>
