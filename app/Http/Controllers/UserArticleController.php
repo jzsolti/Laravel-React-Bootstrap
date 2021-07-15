@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\ArticleRequest;
 use App\Models\Article;
-use DB;
+use App\Http\Resources\ArticleResource;
 
 class UserArticleController extends Controller
 {
@@ -21,16 +21,10 @@ class UserArticleController extends Controller
 
     public function index(Request $request)
     {
-        $articles = Article::where('user_id', $request->user()->id)->orderBy('created_at','desc')->get();
+        $query  = Article::where('user_id', $request->user()->id)->orderBy($request->column, $request->order);
+        $articles = $query->paginate($request->per_page ?? 10);
 
-        $response = [];
-
-        foreach ($articles as $i => $article) {
-            $article->created = $article->created_at->format('Y-m-d');
-            $response[$i] = $article;
-        }
-
-        return response($response);
+        return ArticleResource::collection($articles);
     }
 
     public function article(Request $request, Article $article)

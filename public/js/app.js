@@ -12270,6 +12270,318 @@ var App = /*#__PURE__*/function (_React$Component) {
 
 /***/ }),
 
+/***/ "./resources/js/components/DataTable.js":
+/*!**********************************************!*\
+  !*** ./resources/js/components/DataTable.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _config_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config/api */ "./resources/js/config/api.js");
+/* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @fortawesome/react-fontawesome */ "./node_modules/@fortawesome/react-fontawesome/index.es.js");
+/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.es.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+/* 
+* https://medium.com/@madhusudhansubedi/dynamic-datatable-component-using-laravel-and-react-js-171ae3dd92d2
+* https://github.com/madhusudhan1234/React-datatable-laravel 
+*/
+
+
+
+
+
+
+
+var DataTable = /*#__PURE__*/function (_React$Component) {
+  _inherits(DataTable, _React$Component);
+
+  var _super = _createSuper(DataTable);
+
+  function DataTable(props) {
+    var _this;
+
+    _classCallCheck(this, DataTable);
+
+    _this = _super.call(this, props); //console.log(this.props);
+
+    _this.state = {
+      entities: {
+        data: [],
+        meta: {
+          current_page: 1,
+          from: 1,
+          last_page: 1,
+          per_page: 5,
+          to: 1,
+          total: 1
+        }
+      },
+      first_page: 1,
+      current_page: 1,
+      sorted_column: _this.props.columns[_this.props.sorted_column ? _this.props.sorted_column : 0],
+      offset: 4,
+      order: 'asc'
+    };
+    return _this;
+  }
+
+  _createClass(DataTable, [{
+    key: "fetchEntities",
+    value: function fetchEntities() {
+      var _this2 = this;
+
+      var fetchUrl = "".concat(this.props.url, "/?page=").concat(this.state.current_page, "&column=").concat(this.state.sorted_column, "&order=").concat(this.state.order, "&per_page=").concat(this.state.entities.meta.per_page);
+      _config_api__WEBPACK_IMPORTED_MODULE_1__.default.get(fetchUrl).then(function (response) {
+        _this2.setState({
+          entities: response.data
+        });
+      })["catch"](function (e) {
+        console.error(e);
+      });
+    }
+  }, {
+    key: "changePage",
+    value: function changePage(pageNumber) {
+      var _this3 = this;
+
+      this.setState({
+        current_page: pageNumber
+      }, function () {
+        _this3.fetchEntities();
+      });
+    }
+  }, {
+    key: "columnHead",
+    value: function columnHead(value) {
+      return value.split('_').join(' ').toUpperCase();
+    }
+  }, {
+    key: "pagesNumbers",
+    value: function pagesNumbers() {
+      if (!this.state.entities.meta.to) {
+        return [];
+      }
+
+      var from = this.state.entities.meta.current_page - this.state.offset;
+
+      if (from < 1) {
+        from = 1;
+      }
+
+      var to = from + this.state.offset * 2;
+
+      if (to >= this.state.entities.meta.last_page) {
+        to = this.state.entities.meta.last_page;
+      }
+
+      var pagesArray = [];
+
+      for (var page = from; page <= to; page++) {
+        pagesArray.push(page);
+      }
+
+      return pagesArray;
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this4 = this;
+
+      this.setState({
+        current_page: this.state.entities.meta.current_page
+      }, function () {
+        _this4.fetchEntities();
+      });
+    }
+  }, {
+    key: "tableHeads",
+    value: function tableHeads() {
+      var _this5 = this;
+
+      var icon;
+
+      if (this.state.order === 'asc') {
+        icon = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_2__.FontAwesomeIcon, {
+          icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__.faArrowUp
+        });
+      } else {
+        icon = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_2__.FontAwesomeIcon, {
+          icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__.faArrowDown
+        });
+      }
+
+      return this.props.columns.map(function (column) {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("th", {
+          className: "table-head",
+          onClick: function onClick() {
+            return _this5.sortByColumn(column);
+          },
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+            children: _this5.columnHead(column)
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
+            children: column === _this5.state.sorted_column && icon
+          })]
+        }, column);
+      });
+    }
+  }, {
+    key: "tableRows",
+    value: function tableRows() {
+      var _this6 = this;
+
+      if (this.state.entities.data.length) {
+        return this.state.entities.data.map(function (entity) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tr", {
+            children: Object.keys(entity).map(function (key) {
+              if (_this6.props.columns.includes(key)) {
+                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
+                  children: entity[key]
+                }, key);
+              }
+            })
+          }, entity.id);
+        });
+      } else {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tr", {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
+            colSpan: this.props.columns.length,
+            className: "text-center",
+            children: "No Records Found."
+          })
+        });
+      }
+    }
+  }, {
+    key: "sortByColumn",
+    value: function sortByColumn(column) {
+      var _this7 = this;
+
+      if (column === this.state.sorted_column) {
+        this.state.order === 'asc' ? this.setState({
+          order: 'desc',
+          current_page: this.state.first_page
+        }, function () {
+          _this7.fetchEntities();
+        }) : this.setState({
+          order: 'asc'
+        }, function () {
+          _this7.fetchEntities();
+        });
+      } else {
+        this.setState({
+          sorted_column: column,
+          order: 'asc',
+          current_page: this.state.first_page
+        }, function () {
+          _this7.fetchEntities();
+        });
+      }
+    }
+  }, {
+    key: "pageList",
+    value: function pageList() {
+      var _this8 = this;
+
+      return this.pagesNumbers().map(function (page) {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
+          className: page === _this8.state.entities.meta.current_page ? 'page-item active' : 'page-item',
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+            className: "page-link",
+            onClick: function onClick() {
+              return _this8.changePage(page);
+            },
+            children: page
+          })
+        }, page);
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this9 = this;
+
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
+        className: "data-table",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("table", {
+          className: "table table-bordered",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("thead", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tr", {
+              children: this.tableHeads()
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tbody", {
+            children: this.tableRows()
+          })]
+        }), this.state.entities.data && this.state.entities.data.length > 0 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("nav", {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("ul", {
+            className: "pagination",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
+              className: "page-item",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+                className: "page-link",
+                disabled: 1 === this.state.entities.meta.current_page,
+                onClick: function onClick() {
+                  return _this9.changePage(_this9.state.entities.meta.current_page - 1);
+                },
+                children: "Previous"
+              })
+            }), this.pageList(), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
+              className: "page-item",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("button", {
+                className: "page-link",
+                disabled: this.state.entities.meta.last_page === this.state.entities.meta.current_page,
+                onClick: function onClick() {
+                  return _this9.changePage(_this9.state.entities.meta.current_page + 1);
+                },
+                children: "Next"
+              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
+              style: {
+                marginTop: '8px'
+              },
+              children: [" \xA0 ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("i", {
+                children: ["Displaying ", this.state.entities.data.length, " of ", this.state.entities.meta.total, " entries."]
+              })]
+            })]
+          })
+        })]
+      });
+    }
+  }]);
+
+  return DataTable;
+}(react__WEBPACK_IMPORTED_MODULE_0__.Component);
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DataTable);
+
+/***/ }),
+
 /***/ "./resources/js/components/auth/ForgotPassword.js":
 /*!********************************************************!*\
   !*** ./resources/js/components/auth/ForgotPassword.js ***!
@@ -13769,9 +14081,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router/esm/react-router.js");
-/* harmony import */ var _config_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../config/api */ "./resources/js/config/api.js");
-/* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @fortawesome/react-fontawesome */ "./node_modules/@fortawesome/react-fontawesome/index.es.js");
+/* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @fortawesome/react-fontawesome */ "./node_modules/@fortawesome/react-fontawesome/index.es.js");
 /* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.es.js");
+/* harmony import */ var _DataTable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../DataTable */ "./resources/js/components/DataTable.js");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -13814,28 +14126,11 @@ var MyArticles = /*#__PURE__*/function (_React$Component) {
     _classCallCheck(this, MyArticles);
 
     _this = _super.call(this);
-    _this.state = {
-      articles: [],
-      loaded: false
-    };
+    _this.columns = ['title', 'lead', 'created_at'];
     return _this;
   }
 
   _createClass(MyArticles, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      var _this2 = this;
-
-      _config_api__WEBPACK_IMPORTED_MODULE_1__.default.get("user/articles").then(function (response) {
-        _this2.setState({
-          loaded: true,
-          articles: response.data
-        });
-      })["catch"](function (error) {
-        console.log(error);
-      });
-    }
-  }, {
     key: "render",
     value: function render() {
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
@@ -13852,55 +14147,15 @@ var MyArticles = /*#__PURE__*/function (_React$Component) {
                 children: [" ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
                   to: "/user/article",
                   className: "btn btn-primary",
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_2__.FontAwesomeIcon, {
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_1__.FontAwesomeIcon, {
                     icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_5__.faPlus
                   })
                 }), " "]
               })]
-            }), this.state.loaded ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("table", {
-              className: "table table-dark",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("thead", {
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("tr", {
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
-                    scope: "col",
-                    children: "#"
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
-                    scope: "col",
-                    children: "Title"
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
-                    scope: "col",
-                    children: "Lead"
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
-                    scope: "col",
-                    children: "Created"
-                  })]
-                })
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tbody", {
-                children: this.state.articles.map(function (article, i) {
-                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("tr", {
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
-                      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_router_dom__WEBPACK_IMPORTED_MODULE_4__.Link, {
-                        to: "/user/article/".concat(article.id),
-                        children: "Detail "
-                      })
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("th", {
-                      scope: "row",
-                      children: article.title
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
-                      children: article.lead
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
-                      children: article.created
-                    })]
-                  }, article.id);
-                })
-              })]
-            }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-              className: "spinner-border",
-              role: "status",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-                className: "sr-only",
-                children: "Loading "
-              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_DataTable__WEBPACK_IMPORTED_MODULE_2__.default, {
+              url: "/user/articles",
+              columns: this.columns,
+              sorted_column: 2
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
               className: "card-body"
             })]

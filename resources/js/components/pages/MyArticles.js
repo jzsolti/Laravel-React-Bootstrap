@@ -1,28 +1,21 @@
 import React from 'react';
 import { withRouter, Link } from "react-router-dom";
-import api from '../../config/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import DataTable from "../DataTable";
 
 class MyArticles extends React.Component {
 
     constructor() {
         super();
+        this.columns = [
+            'title'  ,
+            'lead',
+            'created_at'
+        ];
 
-        this.state = {
-            articles: [],
-            loaded: false
-        }
-    }
 
-    componentDidMount() {
 
-        api.get(`user/articles`)
-            .then((response) => {
-                this.setState({ loaded: true, articles: response.data });
-            }).catch((error) => {
-                console.log(error);
-            });
     }
 
     render() {
@@ -35,40 +28,16 @@ class MyArticles extends React.Component {
                             <div>My articles</div>
                             <div> <Link to="/user/article" className="btn btn-primary"><FontAwesomeIcon icon={faPlus} /></Link> </div>
                         </div>
-                        
-                            {
-                                this.state.loaded ?
-                                    <table className="table table-dark">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">#</th>
-                                                <th scope="col">Title</th>
-                                                <th scope="col">Lead</th>
-                                                <th scope="col">Created</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {
-                                                this.state.articles.map((article, i) => {
-                                                    return <tr key={article.id}>
-                                                        <td>
-                                                            <Link to={`/user/article/${article.id}`}>Detail </Link>
-                                                        </td>
-                                                        <th scope="row">{article.title}</th>
-                                                        <td>{article.lead}</td>
-                                                        <td>{article.created}</td>
-                                                    </tr>
-                                                })
 
-                                            }
-                                        </tbody>
-                                    </table>
-                                    :
-                                    <div className="spinner-border" role="status">
-                                        <span className="sr-only">Loading </span>
-                                    </div>
-                            }
-                        <div className="card-body"></div>
+                        <DataTable
+                            url="/user/articles"
+                            columns={this.columns}
+                            sorted_column={2}
+                        />
+
+                        <div className="card-body">
+
+                        </div>
                     </div>
                 </div>
             </div>
