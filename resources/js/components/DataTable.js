@@ -34,7 +34,7 @@ class DataTable extends React.Component {
             current_page: 1,
             sorted_column: this.props.sorted_column,
             offset: 4,
-            order: 'asc',
+            order: 'desc',
         };
     }
 

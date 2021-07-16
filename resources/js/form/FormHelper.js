@@ -1,7 +1,7 @@
 export default  class FormHelper {
 
-    static inputClassName(inputErrorState){
-        let className = 'form-control';
+    static inputClassName(inputErrorState, className = 'form-control'){
+        
 
         if(typeof inputErrorState === 'undefined'){
             return className;
@@ -17,8 +17,7 @@ export default  class FormHelper {
         return className;
     }
 
-    static feedbackClass(inputState){
-        let className = '';
+    static feedbackClass(inputState, className = ''){
 
         if (inputState === '' || inputState === null) {
             className = 'valid-feedback';
@@ -50,9 +49,9 @@ export default  class FormHelper {
     }
 
     static getFormData( inputs, state){
-        let formData = {};
+        let formData = new FormData();
         inputs.forEach((item) => {
-            formData[item] = state[item];
+            formData.append(item, state[item]);
         });
         return formData;
     }

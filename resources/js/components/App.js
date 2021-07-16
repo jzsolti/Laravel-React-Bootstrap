@@ -100,7 +100,7 @@ class App extends React.Component {
                             <Route path="/user-account" >
                                 {this.state.userLoggedIn ? <UserAccount /> : <Page404 />}
                             </Route>
-                            <Route path="/user/articles" >
+                            <Route exact path="/user/articles" >
                                 {this.state.userLoggedIn ? <MyArticles/> : <Page404 />}
                             </Route>
 

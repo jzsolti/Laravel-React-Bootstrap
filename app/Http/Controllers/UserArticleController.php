@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\ArticleRequest;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Article;
-use App\Http\Resources\ArticleResource;
+use App\Http\Resources\ArticlesResource, App\Http\Resources\ArticleResource;
+use App\Http\Requests\ArticleRequest;
 
 class UserArticleController extends Controller
 {
@@ -24,7 +26,7 @@ class UserArticleController extends Controller
         $query  = Article::where('user_id', $request->user()->id)->orderBy($request->column, $request->order);
         $articles = $query->paginate($request->per_page ?? 10);
 
-        return ArticleResource::collection($articles);
+        return ArticlesResource::collection($articles);
     }
 
     public function article(Request $request, Article $article)
@@ -32,7 +34,8 @@ class UserArticleController extends Controller
         if ($request->user()->id !== $article->user_id) {
             abort(404);
         }
-        return response($article->only(['title', 'lead', 'content']));
+
+        return new ArticleResource($article);
     }
 
     /**
@@ -42,11 +45,17 @@ class UserArticleController extends Controller
      */
     public function create(ArticleRequest $request)
     {
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $path = Storage::disk('public')->putFile(Article::IMAGE_PATH, new File($request->image->path()));
+            $filename = str_replace(Article::IMAGE_PATH, "", $path);
+        }
+
         $article = Article::create([
             'user_id' => $request->user()->id,
             'title' => $request->title,
             'lead' => $request->lead,
             'content' => $request->content,
+            'image' => $filename ?? null
         ]);
 
         return response(['id' => $article->id]);
@@ -58,11 +67,50 @@ class UserArticleController extends Controller
             abort(404);
         }
 
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $this->deleteArticleImage($article);
+            $path = Storage::disk('public')->putFile(Article::IMAGE_PATH, new File($request->image->path()));
+            $filename = str_replace(Article::IMAGE_PATH, "", $path);
+        }
+
         $article->update([
             'title' => $request->title,
             'lead' => $request->lead,
             'content' => $request->content,
+            'image' => $filename ?? null
         ]);
         return response(['updated' => true]);
+    }
+
+    public function delete(Request $request, Article $article)
+    {
+        if ($request->user()->id !== $article->user_id) {
+            abort(404);
+        }
+
+        $this->deleteArticleImage($article);
+        $article->delete();
+
+        return response(['deleted' => true]);
+    }
+
+    public function deleteImage(Request $request, Article $article)
+    {
+        if ($request->user()->id !== $article->user_id) {
+            abort(404);
+        }
+
+        $this->deleteArticleImage($article);
+
+        return response(['deleted' => true]);
+    }
+
+    private function deleteArticleImage($article)
+    {
+        if ($article->image &&  Storage::disk('public')->exists($article->imagePath)) {
+            Storage::disk('public')->delete($article->imagePath);
+            $article->image = null;
+            $article->save();
+        }
     }
 }

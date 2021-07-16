@@ -41,9 +41,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('user/articles', 'App\Http\Controllers\UserArticleController@index');
     Route::post('user/article/create', 'App\Http\Controllers\UserArticleController@create');
+    
     Route::post('user/article/{article}/update', 'App\Http\Controllers\UserArticleController@update');
+
     Route::get('user/article/{article}', 'App\Http\Controllers\UserArticleController@article');
     
-
+    Route::delete('user/article/{article}/delete-image', 'App\Http\Controllers\UserArticleController@deleteImage');
+    Route::delete('user/article/{article}', 'App\Http\Controllers\UserArticleController@delete');
 
 });
