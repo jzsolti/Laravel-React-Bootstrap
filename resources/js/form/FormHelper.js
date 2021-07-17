@@ -48,11 +48,16 @@ export default  class FormHelper {
 
     }
 
-    static getFormData( inputs, state){
+    static getFormData( inputs, state, additional = {}){
         let formData = new FormData();
         inputs.forEach((item) => {
             formData.append(item, state[item]);
         });
+
+        for (const [key, value] of Object.entries(additional)) {
+            formData.append(key, value);
+        }
+
         return formData;
     }
 

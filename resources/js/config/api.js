@@ -21,9 +21,8 @@ function createAxiosResponseInterceptor(axiosInstance) {
 createAxiosResponseInterceptor(instance);
 export default instance;
 */
-
 export default axios.create({
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'multipart/form-data' },
     baseURL: 'http://127.0.0.1:8000/api',
     withCredentials: true
 });

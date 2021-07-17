@@ -30,23 +30,16 @@ Route::post('password/send-resetlink-email', 'App\Http\Controllers\SpaAuth\Forgo
 Route::post('password/confirm', ' App\Http\Controllers\SpaAuth\ForgotPasswordController@confirm');
 Route::post('password/reset-password', 'App\Http\Controllers\SpaAuth\ForgotPasswordController@resetPassword');
 
-
-/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});*/
-
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user-account/get-user', 'App\Http\Controllers\UserController@getUser');
     Route::post('user-account/update', 'App\Http\Controllers\UserController@update');
 
-    Route::get('user/articles', 'App\Http\Controllers\UserArticleController@index');
-    Route::post('user/article/create', 'App\Http\Controllers\UserArticleController@create');
-    
-    Route::post('user/article/{article}/update', 'App\Http\Controllers\UserArticleController@update');
-
-    Route::get('user/article/{article}', 'App\Http\Controllers\UserArticleController@article');
-    
-    Route::delete('user/article/{article}/delete-image', 'App\Http\Controllers\UserArticleController@deleteImage');
-    Route::delete('user/article/{article}', 'App\Http\Controllers\UserArticleController@delete');
-
+    Route::prefix('user/articles')->group(function () {
+        Route::get('/', 'App\Http\Controllers\UserArticleController@index');
+        Route::get('/{article}', 'App\Http\Controllers\UserArticleController@article');
+        Route::post('/create', 'App\Http\Controllers\UserArticleController@create');
+        Route::put('/{article}', 'App\Http\Controllers\UserArticleController@update');
+        Route::delete('/{article}', 'App\Http\Controllers\UserArticleController@delete');
+        Route::delete('/{article}/delete-image', 'App\Http\Controllers\UserArticleController@deleteImage');
+    });
 });

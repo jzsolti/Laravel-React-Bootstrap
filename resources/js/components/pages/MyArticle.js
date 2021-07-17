@@ -5,6 +5,10 @@ import FormHelper from '../../form/FormHelper';
 import SendingBtn from '../../form/SendingBtn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content'
+
+const ReactSwal = withReactContent(Swal);
 
 class MyArticle extends React.Component {
 
@@ -14,9 +18,6 @@ class MyArticle extends React.Component {
         this.inputs = ['title', 'lead', 'content', 'image'];
 
         this.state = {
-            created: false,
-            updated: false,
-            imageDeleted: false,
             isDisabled: false,
             imagePreView: null,
             formErrors: {
@@ -50,7 +51,7 @@ class MyArticle extends React.Component {
 
         let articleId = this.getId();
         if (articleId !== null) {
-            api.get(`user/article/${articleId}`)
+            api.get(`user/articles/${articleId}`)
                 .then((response) => {
 
                     let responseData = response.data.data;
@@ -70,6 +71,12 @@ class MyArticle extends React.Component {
                 });
         }
 
+    }
+
+    componentWillUnmount(){
+        this.setState = (state, callback) => {
+            return;
+          }
     }
 
     getId() {
@@ -101,23 +108,34 @@ class MyArticle extends React.Component {
         event.preventDefault();
         this.setState({ isDisabled: true });
 
-        const action = (this.getId() === null) ? 'user/article/create' : `user/article/${this.getId()}/update`;
+        let action, formData = null;
+        if (this.getId() === null) {
+            action = `user/articles/create`;
+            formData = FormHelper.getFormData(this.inputs, this.state);
+        } else {
+            action = `user/articles/${this.getId()}`;
+            formData = FormHelper.getFormData(this.inputs, this.state, { "_method": "put" });
+        }
 
-
-        
-        api.post(action, FormHelper.getFormData(this.inputs, this.state))
+        api.post(action, formData)
             .then((response) => {
                 if ('id' in response.data) {
-                    this.setState({ isDisabled: false, created: true });
-
-                    setTimeout(() => { this.setState({ created: false }); }, 5000);
-
+                    this.setState({ isDisabled: false,  formErrors: FormHelper.resetValidation(this.inputs) });
+                    Swal.fire({
+                        icon: 'success',
+                        title: `New article created`,
+                        timer: 1000
+                      });
                     this.props.history.push(`/user/article/${response.data.id}`);
                 }
 
                 if ('updated' in response.data) {
-                    this.setState({ isDisabled: false, updated: true, formErrors: FormHelper.resetValidation(this.inputs) });
-                    setTimeout(() => { this.setState({ updated: false }); }, 5000);
+                    this.setState({ isDisabled: false,  formErrors: FormHelper.resetValidation(this.inputs) });
+                    Swal.fire({
+                        icon: 'success',
+                        title: `Article updated`,
+                        timer: 1000
+                      });
                 }
             })
             .catch((error) => {
@@ -131,20 +149,20 @@ class MyArticle extends React.Component {
                 }
             });
 
-       
-
-
-
     }
 
     deletImageHandler = (event) => {
         event.preventDefault();
 
-        api.delete(`user/article/${this.getId()}/delete-image`)
+        api.delete(`user/articles/${this.getId()}/delete-image`)
             .then((response) => {
                 if ('deleted' in response.data) {
-                    this.setState({ imagePreView: null, imageDeleted: true });
-                    setTimeout(() => { this.setState({ imageDeleted: false }); }, 5000);
+                    this.setState({ imagePreView: null });
+                    Swal.fire({
+                        icon: 'success',
+                        title: `Image deleted`,
+                        timer: 1000
+                      });
                 }
             })
             .catch((error) => {
@@ -156,15 +174,26 @@ class MyArticle extends React.Component {
     deleteHandler = (event) => {
         event.preventDefault();
 
-        api.delete(`user/article/${this.getId()}`)
-            .then((response) => {
-                if ('deleted' in response.data) {
-                    this.props.history.push('/user/articles');
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+        ReactSwal.fire({
+            title: '<strong class="text-danger">Are you sure?</strong>',
+            icon: 'warning',
+            showDenyButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: 'No',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                api.delete(`user/articles/${this.getId()}`)
+                    .then((response) => {
+                        if ('deleted' in response.data) {
+                            localStorage.setItem('status', 'Article deleted!');
+                            this.props.history.push('/user/articles');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            } 
+        });
 
     }
 
@@ -183,10 +212,6 @@ class MyArticle extends React.Component {
         return (
             <div className="row justify-content-center pt-5">
                 <div className="col-md-8">
-
-                    {this.state.created && <div className="alert alert-success">New article created </div>}
-                    {this.state.updated && <div className="alert alert-success">Article updated </div>}
-                    {this.state.imageDeleted && <div className="alert alert-success">Image deleted </div>}
 
                     <div className="card">
                         <div className="card-header bg-warning d-flex justify-content-between">
@@ -256,8 +281,6 @@ class MyArticle extends React.Component {
                                             </button>
                                         </div>
                                     }
-
-
                                 </div>
                             </form>
                         </div>
