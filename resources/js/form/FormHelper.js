@@ -1,9 +1,9 @@
-export default  class FormHelper {
+export default class FormHelper {
 
-    static inputClassName(inputErrorState, className = 'form-control'){
-        
+    static inputClassName(inputErrorState, className = 'form-control') {
 
-        if(typeof inputErrorState === 'undefined'){
+
+        if (typeof inputErrorState === 'undefined') {
             return className;
         }
 
@@ -17,7 +17,7 @@ export default  class FormHelper {
         return className;
     }
 
-    static feedbackClass(inputState, className = ''){
+    static feedbackClass(inputState, className = '') {
 
         if (inputState === '' || inputState === null) {
             className = 'valid-feedback';
@@ -27,7 +27,7 @@ export default  class FormHelper {
         return className;
     }
 
-    static updateFormErrors(formErrorsState, responseErrors){
+    static updateFormErrors(formErrorsState, responseErrors) {
 
         for (const [key, value] of Object.entries(formErrorsState)) {
             if (key in responseErrors) {
@@ -39,19 +39,24 @@ export default  class FormHelper {
         return formErrorsState;
     }
 
-    static handleInputChangeNewValue(event){
+    static handleInputChangeNewValue(event) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
-
-        return {[name]: value};
-
+        return { [name]: value };
     }
 
-    static getFormData( inputs, state, additional = {}){
+    static getFormData(inputs, state, additional = {}) {
         let formData = new FormData();
+
         inputs.forEach((item) => {
-            formData.append(item, state[item]);
+            if (typeof state[item] === 'object' && Array.isArray(state[item])) {
+                state[item].forEach((arrayItem) => {
+                    formData.append(item + '[]', arrayItem);
+                });
+            } else {
+                formData.append(item, state[item]);
+            }
         });
 
         for (const [key, value] of Object.entries(additional)) {
@@ -61,7 +66,7 @@ export default  class FormHelper {
         return formData;
     }
 
-    static resetValidation( inputs){
+    static resetValidation(inputs) {
         let formErrors = {};
         inputs.forEach((item) => {
             formErrors[item] = null;

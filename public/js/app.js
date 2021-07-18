@@ -13998,24 +13998,32 @@ var MyArticle = /*#__PURE__*/function (_React$Component) {
       });
     });
 
-    _this.inputs = ['title', 'lead', 'content', 'image'];
+    _this.inputs = ['title', 'lead', 'content', 'image', 'article_labels'];
     _this.state = {
+      loaded: false,
       isDisabled: false,
       imagePreView: null,
+      labels: [],
       formErrors: {
         title: null,
         lead: null,
         content: null,
-        image: null
+        image: null,
+        article_labels: null
       }
     };
 
     _this.inputs.forEach(function (item) {
-      _this.state[item] = '';
+      if (item === 'article_labels') {
+        _this.state[item] = [];
+      } else {
+        _this.state[item] = '';
+      }
     });
 
     _this.handleInputChange = _this.handleInputChange.bind(_assertThisInitialized(_this));
     _this.handleFileInputChange = _this.handleFileInputChange.bind(_assertThisInitialized(_this));
+    _this.handleLabelsChange = _this.handleLabelsChange.bind(_assertThisInitialized(_this));
     return _this;
   }
 
@@ -14033,30 +14041,68 @@ var MyArticle = /*#__PURE__*/function (_React$Component) {
       this.setState(_form_FormHelper__WEBPACK_IMPORTED_MODULE_2__.default.handleInputChangeNewValue(event));
     }
   }, {
+    key: "handleLabelsChange",
+    value: function handleLabelsChange(event) {
+      var labels = this.state.article_labels;
+      var value = parseInt(event.target.value);
+
+      if (event.target.checked) {
+        labels.push(value);
+        this.setState({
+          article_labels: labels
+        });
+      } else {
+        var index = labels.indexOf(value);
+
+        if (index >= 0) {
+          labels.splice(index, 1);
+          this.setState({
+            article_labels: labels
+          });
+        }
+      }
+    }
+  }, {
     key: "componentDidMount",
     value: function componentDidMount() {
       var _this2 = this;
 
       var articleId = this.getId();
+      _config_api__WEBPACK_IMPORTED_MODULE_1__.default.get("labels").then(function (response) {
+        _this2.setState({
+          labels: response.data.data
+        });
+      })["catch"](function (error) {
+        console.error(error);
+      }).then(function () {
+        if (articleId === null) {
+          return null;
+        }
 
-      if (articleId !== null) {
-        _config_api__WEBPACK_IMPORTED_MODULE_1__.default.get("user/articles/".concat(articleId)).then(function (response) {
+        return _config_api__WEBPACK_IMPORTED_MODULE_1__.default.get("user/articles/".concat(articleId));
+      }).then(function (response) {
+        if (response) {
           var responseData = response.data.data;
 
           _this2.setState({
             title: responseData.title,
             lead: responseData.lead,
             content: responseData.content,
-            imagePreView: responseData.image_src
+            imagePreView: responseData.image_src,
+            article_labels: responseData.labels
           });
-        })["catch"](function (error) {
-          if (error.response && error.response.status === 404) {
-            _this2.props.history.push('/_404');
-          } else {
-            console.error(error);
-          }
+        }
+      }).then(function () {
+        _this2.setState({
+          loaded: true
         });
-      }
+      })["catch"](function (error) {
+        if (error.response && error.response.status === 404) {
+          _this2.props.history.push('/_404');
+        } else {
+          console.error(error);
+        }
+      });
     }
   }, {
     key: "componentWillUnmount",
@@ -14117,6 +14163,8 @@ var MyArticle = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
+      var _this3 = this;
+
       return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
         className: "row justify-content-center pt-5",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
@@ -14135,7 +14183,22 @@ var MyArticle = /*#__PURE__*/function (_React$Component) {
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("form", {
                 method: "POST",
                 onSubmit: this.submitHandler,
-                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
+                  className: "form-group",
+                  children: this.state.isDisabled ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_form_SendingBtn__WEBPACK_IMPORTED_MODULE_3__.default, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
+                    className: "d-flex justify-content-between",
+                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("button", {
+                      type: "submit",
+                      className: "btn btn-primary",
+                      children: "Save"
+                    }), this.getId() && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("button", {
+                      type: "button",
+                      className: "btn btn-danger",
+                      onClick: this.deleteHandler,
+                      children: "Delete"
+                    })]
+                  })
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
                   className: "row",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
                     className: "col-md-6",
@@ -14148,10 +14211,7 @@ var MyArticle = /*#__PURE__*/function (_React$Component) {
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
                       className: "form-group",
                       children: [this.label('content', 'Content'), this.textarea('content', 7), this.inputError('content')]
-                    })]
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
-                    className: "col-md-6",
-                    children: [this.label('image', 'Image'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
+                    }), this.label('image', 'Image'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
                       className: "custom-file",
                       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("label", {
                         className: "custom-file-label",
@@ -14177,22 +14237,33 @@ var MyArticle = /*#__PURE__*/function (_React$Component) {
                       src: this.state.imagePreView,
                       className: "img-thumbnail"
                     })]
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
+                    className: "col-md-6",
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("ul", {
+                      className: "llist-group",
+                      children: this.state.loaded ? this.state.labels.map(function (label) {
+                        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("li", {
+                          className: "list-group-item",
+                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
+                            className: "form-check",
+                            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("input", {
+                              className: "form-check-input",
+                              name: "article_labels[]",
+                              type: "checkbox",
+                              value: label.id,
+                              onChange: _this3.handleLabelsChange,
+                              id: "labelcb".concat(label.id),
+                              defaultChecked: _this3.state.article_labels.includes(label.id)
+                            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("label", {
+                              className: "form-check-label",
+                              htmlFor: "labelcb".concat(label.id),
+                              children: label.name
+                            })]
+                          })
+                        }, label.id);
+                      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_form_SendingBtn__WEBPACK_IMPORTED_MODULE_3__.default, {})
+                    })
                   })]
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
-                  className: "form-group",
-                  children: this.state.isDisabled ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_form_SendingBtn__WEBPACK_IMPORTED_MODULE_3__.default, {}) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)("div", {
-                    className: "d-flex justify-content-between",
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("button", {
-                      type: "submit",
-                      className: "btn btn-primary",
-                      children: "Save"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("button", {
-                      type: "button",
-                      className: "btn btn-danger",
-                      onClick: this.deleteHandler,
-                      children: "Delete"
-                    })]
-                  })
                 })]
               })
             })]
@@ -14727,6 +14798,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ FormHelper)
 /* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -14815,7 +14888,13 @@ var FormHelper = /*#__PURE__*/function () {
       var additional = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
       var formData = new FormData();
       inputs.forEach(function (item) {
-        formData.append(item, state[item]);
+        if (_typeof(state[item]) === 'object' && Array.isArray(state[item])) {
+          state[item].forEach(function (arrayItem) {
+            formData.append(item + '[]', arrayItem);
+          });
+        } else {
+          formData.append(item, state[item]);
+        }
       });
 
       for (var _i2 = 0, _Object$entries2 = Object.entries(additional); _i2 < _Object$entries2.length; _i2++) {

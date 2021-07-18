@@ -42,4 +42,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/{article}', 'App\Http\Controllers\UserArticleController@delete');
         Route::delete('/{article}/delete-image', 'App\Http\Controllers\UserArticleController@deleteImage');
     });
+
+    Route::prefix('labels')->group(function () {
+        Route::get('/', 'App\Http\Controllers\LabelsController@index');
+       
+    });
 });

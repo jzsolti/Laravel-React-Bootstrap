@@ -14,9 +14,13 @@ class Article extends Model
 
     protected $guarded = ['id'];
 
+    public function labels(){
+        return $this->belongsToMany('App\Models\Label');
+    }
+
     public function user()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Model\User');
     }
 
     public function getImagePathAttribute()

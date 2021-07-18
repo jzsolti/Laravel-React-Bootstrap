@@ -57,6 +57,10 @@ class UserArticleController extends Controller
             'image' => $filename ?? null
         ]);
 
+        if($request->article_labels){
+            $article->labels()->attach($request->article_labels);
+        }
+
         return response(['id' => $article->id]);
     }
 
@@ -78,6 +82,11 @@ class UserArticleController extends Controller
             'content' => $request->content,
             'image' => $filename ?? null
         ]);
+        if($request->article_labels){
+            $article->labels()->sync($request->article_labels);
+        }else{
+            $article->labels()->detach();
+        }
         return response(['updated' => true]);
     }
 
@@ -88,6 +97,7 @@ class UserArticleController extends Controller
         }
 
         $this->deleteArticleImage($article);
+        $article->labels()->detach();
         $article->delete();
 
         return response(['deleted' => true]);

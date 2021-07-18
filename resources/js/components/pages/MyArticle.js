@@ -15,25 +15,33 @@ class MyArticle extends React.Component {
     constructor(props) {
         super(props);
 
-        this.inputs = ['title', 'lead', 'content', 'image'];
+        this.inputs = ['title', 'lead', 'content', 'image', 'article_labels'];
 
         this.state = {
+            loaded: false,
             isDisabled: false,
             imagePreView: null,
+            labels: [],
             formErrors: {
                 title: null,
                 lead: null,
                 content: null,
-                image: null
+                image: null,
+                article_labels: null
             }
         };
 
         this.inputs.forEach((item) => {
-            this.state[item] = '';
+            if (item === 'article_labels') {
+                this.state[item] = [];
+            } else {
+                this.state[item] = '';
+            }
         });
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleFileInputChange = this.handleFileInputChange.bind(this);
+        this.handleLabelsChange = this.handleLabelsChange.bind(this);
     }
 
     handleFileInputChange(event) {
@@ -47,36 +55,70 @@ class MyArticle extends React.Component {
         this.setState(FormHelper.handleInputChangeNewValue(event));
     }
 
+    handleLabelsChange(event) {
+
+        let labels = this.state.article_labels;
+        let value = parseInt(event.target.value);
+
+        if (event.target.checked) {
+            labels.push(value);
+            this.setState({ article_labels: labels });
+        } else {
+            let index = labels.indexOf(value);
+
+            if (index >= 0) {
+                labels.splice(index, 1);
+                this.setState({ article_labels: labels });
+            }
+        }
+
+    }
+
     componentDidMount() {
-
         let articleId = this.getId();
-        if (articleId !== null) {
-            api.get(`user/articles/${articleId}`)
-                .then((response) => {
 
+        api.get(`labels`)
+            .then((response) => {
+                this.setState({ labels: response.data.data });
+            })
+            .catch((error) => {
+                console.error(error);
+            }).then(() => {
+
+                if (articleId === null) {
+                    return null;
+                }
+
+                return api.get(`user/articles/${articleId}`);
+
+            }).then((response) => {
+                if (response) {
                     let responseData = response.data.data;
                     this.setState({
                         title: responseData.title,
                         lead: responseData.lead,
                         content: responseData.content,
-                        imagePreView: responseData.image_src
+                        imagePreView: responseData.image_src,
+                        article_labels: responseData.labels
                     });
-
-                }).catch((error) => {
-                    if (error.response && error.response.status === 404) {
-                        this.props.history.push('/_404');
-                    } else {
-                        console.error(error);
-                    }
-                });
-        }
+                }
+            }).then(() => {
+                this.setState({ loaded: true });
+            })
+            .catch((error) => {
+                if (error.response && error.response.status === 404) {
+                    this.props.history.push('/_404');
+                } else {
+                    console.error(error);
+                }
+            });
 
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         this.setState = (state, callback) => {
             return;
-          }
+        }
     }
 
     getId() {
@@ -120,22 +162,22 @@ class MyArticle extends React.Component {
         api.post(action, formData)
             .then((response) => {
                 if ('id' in response.data) {
-                    this.setState({ isDisabled: false,  formErrors: FormHelper.resetValidation(this.inputs) });
+                    this.setState({ isDisabled: false, formErrors: FormHelper.resetValidation(this.inputs) });
                     Swal.fire({
                         icon: 'success',
                         title: `New article created`,
                         timer: 1000
-                      });
+                    });
                     this.props.history.push(`/user/article/${response.data.id}`);
                 }
 
                 if ('updated' in response.data) {
-                    this.setState({ isDisabled: false,  formErrors: FormHelper.resetValidation(this.inputs) });
+                    this.setState({ isDisabled: false, formErrors: FormHelper.resetValidation(this.inputs) });
                     Swal.fire({
                         icon: 'success',
                         title: `Article updated`,
                         timer: 1000
-                      });
+                    });
                 }
             })
             .catch((error) => {
@@ -162,7 +204,7 @@ class MyArticle extends React.Component {
                         icon: 'success',
                         title: `Image deleted`,
                         timer: 1000
-                      });
+                    });
                 }
             })
             .catch((error) => {
@@ -192,7 +234,7 @@ class MyArticle extends React.Component {
                     .catch((error) => {
                         console.error(error);
                     });
-            } 
+            }
         });
 
     }
@@ -223,6 +265,20 @@ class MyArticle extends React.Component {
 
                             <form method="POST" onSubmit={this.submitHandler}>
 
+                                <div className="form-group">
+                                    {this.state.isDisabled ?
+                                        <SendingBtn />
+                                        :
+                                        <div className="d-flex justify-content-between">
+                                            <button type="submit" className="btn btn-primary" >
+                                                Save
+                                            </button>
+                                            {this.getId() && <button type="button" className="btn btn-danger" onClick={this.deleteHandler} >
+                                                Delete
+                                            </button>}
+                                        </div>
+                                    }
+                                </div>
                                 <div className="row">
                                     <div className="col-md-6">
                                         <div className="form-group">
@@ -242,8 +298,6 @@ class MyArticle extends React.Component {
                                             {this.textarea('content', 7)}
                                             {this.inputError('content')}
                                         </div>
-                                    </div>
-                                    <div className="col-md-6">
 
                                         {this.label('image', 'Image')}
 
@@ -265,23 +319,37 @@ class MyArticle extends React.Component {
                                         }
 
                                         <img src={this.state.imagePreView} className="img-thumbnail" />
+
+                                    </div>
+                                    <div className="col-md-6">
+
+                                        <ul className="llist-group">
+                                            {
+                                                this.state.loaded ?
+                                                    this.state.labels.map(label => {
+                                                        return <li key={label.id} className="list-group-item">
+                                                            <div className="form-check">
+                                                                <input
+                                                                    className="form-check-input"
+                                                                    name="article_labels[]"
+                                                                    type="checkbox"
+                                                                    value={label.id}
+                                                                    onChange={this.handleLabelsChange}
+                                                                    id={`labelcb${label.id}`}
+                                                                    defaultChecked={this.state.article_labels.includes(label.id)} />
+                                                                <label className="form-check-label"
+                                                                    htmlFor={`labelcb${label.id}`}>
+                                                                    {label.name}
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                    })
+                                                    : <SendingBtn />
+                                            }
+                                        </ul>
                                     </div>
                                 </div>
 
-                                <div className="form-group">
-                                    {this.state.isDisabled ?
-                                        <SendingBtn />
-                                        :
-                                        <div className="d-flex justify-content-between">
-                                            <button type="submit" className="btn btn-primary" >
-                                                Save
-                                            </button>
-                                            <button type="button" className="btn btn-danger" onClick={this.deleteHandler} >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    }
-                                </div>
                             </form>
                         </div>
                     </div>
