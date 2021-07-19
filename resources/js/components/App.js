@@ -4,6 +4,7 @@ import { Navbar, Nav } from 'react-bootstrap';
 import Home from './pages/Home';
 import UserAccount from './pages/UserAccount';
 import Articles from './pages/Articles';
+import Article from './pages/Article';
 import MyArticles from './pages/MyArticles';
 import MyArticle from './pages/MyArticle';
 import Page404 from './pages/Page404';
@@ -93,8 +94,11 @@ class App extends React.Component {
                                 <Home />
                             </Route>
                             
-                            <Route path="/articles" >
+                            <Route exact path="/articles" >
                                 <Articles />
+                            </Route>
+                            <Route path="/articles/:id" >
+                                <Article />
                             </Route>
 
                             <Route path="/user-account" >

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Article;
-use App\Http\Resources\ArticlesResource, App\Http\Resources\ArticleResource;
+use App\Http\Resources\UserArticlesResource, App\Http\Resources\UserArticleResource;
 use App\Http\Requests\ArticleRequest;
 
 class UserArticleController extends Controller
@@ -25,7 +25,7 @@ class UserArticleController extends Controller
         $query  = Article::where('user_id', $request->user()->id)->orderBy($request->column, $request->order);
         $articles = $query->paginate($request->per_page ?? 10);
 
-        return ArticlesResource::collection($articles);
+        return UserArticlesResource::collection($articles);
     }
 
     public function article(Request $request, Article $article)
@@ -34,7 +34,7 @@ class UserArticleController extends Controller
             abort(404);
         }
 
-        return new ArticleResource($article);
+        return new UserArticleResource($article);
     }
 
     /**

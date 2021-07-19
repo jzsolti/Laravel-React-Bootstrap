@@ -4,9 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\Article;
-//use App\Http\Resources\LabelsResource;
 
-class ArticleResource extends JsonResource
+class UserArticleResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

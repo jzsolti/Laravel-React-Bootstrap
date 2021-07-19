@@ -6,7 +6,7 @@ import SendingBtn from '../../form/SendingBtn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content'
+import withReactContent from 'sweetalert2-react-content';
 
 const ReactSwal = withReactContent(Swal);
 
@@ -71,7 +71,6 @@ class MyArticle extends React.Component {
                 this.setState({ article_labels: labels });
             }
         }
-
     }
 
     componentDidMount() {
@@ -125,6 +124,13 @@ class MyArticle extends React.Component {
         return (typeof this.props.match.params.id === 'undefined') ? null : this.props.match.params.id;
     }
 
+
+    inputError(name) {
+        return <div className={FormHelper.feedbackClass(this.state.formErrors[name])}>
+            {this.state.formErrors[name]}
+        </div>
+    }
+
     input(name, type) {
         return <input
             name={name}
@@ -159,7 +165,7 @@ class MyArticle extends React.Component {
             formData = FormHelper.getFormData(this.inputs, this.state, { "_method": "put" });
         }
 
-        api.post(action, formData)
+        api.post(action, formData, {headers: { 'Content-Type': 'multipart/form-data' }})
             .then((response) => {
                 if ('id' in response.data) {
                     this.setState({ isDisabled: false, formErrors: FormHelper.resetValidation(this.inputs) });
@@ -210,7 +216,6 @@ class MyArticle extends React.Component {
             .catch((error) => {
                 console.error(error);
             });
-
     }
 
     deleteHandler = (event) => {
@@ -237,16 +242,6 @@ class MyArticle extends React.Component {
             }
         });
 
-    }
-
-    inputError(name) {
-        return <div className={FormHelper.feedbackClass(this.state.formErrors[name])}>
-            {this.state.formErrors[name]}
-        </div>
-    }
-
-    label(name, text) {
-        return <label htmlFor={name} className="">{text}</label>
     }
 
     render() {
@@ -282,25 +277,24 @@ class MyArticle extends React.Component {
                                 <div className="row">
                                     <div className="col-md-6">
                                         <div className="form-group">
-                                            {this.label('title', 'Title')}
+                                            <label htmlFor='title'>Title</label>
                                             {this.input('title', 'text')}
                                             {this.inputError('title')}
                                         </div>
 
                                         <div className="form-group">
-                                            {this.label('lead', 'Lead in')}
+                                            <label htmlFor='lead'>Lead in</label>
                                             {this.textarea('lead', 3)}
                                             {this.inputError('lead')}
                                         </div>
 
                                         <div className="form-group">
-                                            {this.label('content', 'Content')}
+                                            <label htmlFor='content'>Content</label>
                                             {this.textarea('content', 7)}
                                             {this.inputError('content')}
                                         </div>
 
-                                        {this.label('image', 'Image')}
-
+                                        <label htmlFor='image'>Image</label>
                                         <div className="custom-file">
                                             <label className="custom-file-label" >Choose file</label>
                                             <input
@@ -323,7 +317,7 @@ class MyArticle extends React.Component {
                                     </div>
                                     <div className="col-md-6">
 
-                                        <ul className="llist-group">
+                                        <ul className="list-group">
                                             {
                                                 this.state.loaded ?
                                                     this.state.labels.map(label => {

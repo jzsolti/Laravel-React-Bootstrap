@@ -4,9 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
-use App\Models\Article;
 
-class ArticlesResource extends JsonResource
+class UserArticlesResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,10 +17,10 @@ class ArticlesResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'detail' => '/articles/'.$this->id,
+            'edit' => '/user/article/'.$this->id,
             'title' => $this->title,
-            'lead' => Str::limit($this->lead, 40),
-            'image_src' => !is_null($this->image)? Article::IMAGE_URL . $this->image : null,
+            'lead' => Str::limit($this->lead, 20),
+            'content' => $this->content,
             'created_at' => $this->created_at->format('Y-m-d')
         ];
     }
